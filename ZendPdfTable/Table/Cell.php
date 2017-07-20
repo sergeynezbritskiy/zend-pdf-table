@@ -24,7 +24,7 @@ class Cell
      */
     private $_font;
     private $_fontSize = 10;
-    private $_align;
+    private $_hAlign;
     private $_vAlign;
     private $_bgColor;
     private $_color;
@@ -147,17 +147,17 @@ class Cell
      */
     public function setAlignment($align)
     {
-        $this->_align = $align;
+        $this->_hAlign = $align;
     }
 
     /**
-     * Get Alienment
+     * Get Alignment
      *
      * @return int
      */
     public function getAlignment()
     {
-        return $this->_align;
+        return $this->_hAlign;
     }
 
     /**
@@ -287,16 +287,16 @@ class Cell
      * Add text to cell
      *
      * @param string $text
-     * @param int $align Horizontal Alignment
-     * @param int $valign Vertical Alignment
+     * @param int $hAlign Horizontal Alignment
+     * @param int $vAlign Vertical Alignment
      */
-    public function setText($text, $align = null, $valign = null)
+    public function setText($text, $hAlign = null, $vAlign = null)
     {
         $this->_text['text'] = $text;
-        if ($align)
-            $this->_align = $align;
-        if ($valign)
-            $this->_vAlign = $valign;
+        if ($hAlign)
+            $this->_hAlign = $hAlign;
+        if ($vAlign)
+            $this->_vAlign = $vAlign;
     }
 
     /**
@@ -328,21 +328,21 @@ class Cell
      * Add image to cell
      *
      * @param string $filename full path
-     * @param int $align Horizontal Alignment
-     * @param int $valign Vertical Alignment
+     * @param int $hAlign Horizontal Alignment
+     * @param int $vAlign Vertical Alignment
      * @param float $scale between (0,1]
      * @throws \Zend_Exception
      */
-    public function setImage($filename, $align = null, $valign = null, $scale = 1.00)
+    public function setImage($filename, $hAlign = null, $vAlign = null, $scale = 1.00)
     {
         $this->_image['filename'] = $filename;
 
         if ($scale > 1)
-            throw new Zend_Exception("Scale must be between (0,1]", "sergeynezbritskiy\ZendPdfTable\Table\My_Pdf_Table_Cell::addImage()");
+            throw new Zend_Exception("Scale must be between (0,1]", 'sergeynezbritskiy\ZendPdfTable\Table\Cell::addImage()');
         $this->_image['scale'] = $scale;
 
-        $this->_align = $align;
-        $this->_vAlign = $valign;
+        $this->_hAlign = $hAlign;
+        $this->_vAlign = $vAlign;
     }
 
     /**
@@ -616,7 +616,7 @@ class Cell
 
             //@@TODO VERTICAL POSITIONING OF MULTI-LINED TEXT
             $y_inc = $posY - $this->_textLineSpacing; //@@TODO HACK
-            $this->_vAlign = Table::TOP; //@@TODO ONLY TOP ALIGNEMENT IS VALID AT THIS MOMENT
+            $this->_vAlign = Table::TOP; //@@TODO ONLY TOP ALIGNMENT IS VALID AT THIS MOMENT
             foreach ($this->_text['lines'] as $line) {
                 $this->drawText($page, $line, $this->_getTextPosX($posX), $this->_getTextPosY($page, $y_inc));
                 $y_inc += $line_height;
@@ -748,10 +748,10 @@ class Cell
      * @param int $y1
      * @param int $x2
      * @param int $y2
-     * @param string $filltype
+     * @param string $fillType
      * @return \Zend_Pdf_Canvas_Interface
      */
-    public function drawRectangle(\Zend_Pdf_Page $page, $x1, $y1, $x2, $y2, $filltype = null)
+    public function drawRectangle(\Zend_Pdf_Page $page, $x1, $y1, $x2, $y2, $fillType = null)
     {
         //move origin
         $y1 = $page->getHeight() - $y1 - $page->getMargin(Table::TOP);
@@ -759,7 +759,7 @@ class Cell
         $x1 = $x1 + $page->getMargin(Table::LEFT);
         $x2 = $x2 + $page->getMargin(Table::LEFT);
 
-        return $page->drawRectangle($x1, $y1, $x2, $y2, $filltype);
+        return $page->drawRectangle($x1, $y1, $x2, $y2, $fillType);
     }
 
     /**
@@ -771,7 +771,7 @@ class Cell
      */
     private function _getTextPosX($posX)
     {
-        switch ($this->_align) {
+        switch ($this->_hAlign) {
             case Table::RIGHT:
                 $x = $posX + $this->_width - $this->_text['width'] - $this->_padding[Table::RIGHT] - $this->_getBorderLineWidth(Table::RIGHT) / 2;
                 break;
@@ -813,7 +813,7 @@ class Cell
 
     private function _getImagePosX($posX)
     {
-        switch ($this->_align) {
+        switch ($this->_hAlign) {
             case Table::RIGHT:
                 $x = $posX + $this->_width - $this->_image['width'] - $this->_padding[Table::RIGHT];
                 break;

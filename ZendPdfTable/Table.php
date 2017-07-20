@@ -2,6 +2,9 @@
 
 namespace sergeynezbritskiy\ZendPdfTable;
 
+use sergeynezbritskiy\ZendPdfTable\Table\Column;
+use sergeynezbritskiy\ZendPdfTable\Table\Row;
+
 /**
  * Class Table
  *
@@ -24,7 +27,7 @@ class Table
     private $_headerFontSize;
 
     /**
-     * @var \sergeynezbritskiy\ZendPdfTable\Table\Row[]
+     * @var Row[]
      */
     private $_rows;
     private $_headerRow;
@@ -32,38 +35,20 @@ class Table
     private $_pages;        //spanning pages or this table
     private $_repeatHeader = true;
 
-
-    private $_margin;
-
     /**
-     * Set page margins
+     * Table constructor.
      *
-     * @param array (TOP,RIGHT,BOTTOM,LEFT)
+     * @param int $numColumns
      */
-    public function setMargins($margin = array())
+    public function __construct($numColumns)
     {
-        $this->_margin = $margin;
-    }
+        $this->_numColumns = $numColumns;
 
-    /**
-     * Get a Page margin
-     *
-     * @param My_Pdf ::Position $position
-     * @return int margin
-     */
-    public function getMargin($position)
-    {
-        return $this->_margin[$position];
-    }
-
-    /**
-     * Get Page Margins
-     *
-     * @return array(TOP,RIGHT,BOTTOM,LEFT)
-     */
-    public function getMargins()
-    {
-        return $this->_margin;
+        //set fonts
+        $this->_font = \Zend_Pdf_Font::FONT_COURIER;
+        $this->_fontSize = 10;
+        $this->_headerFont = \Zend_Pdf_Font::FONT_COURIER;
+        $this->_headerFontSize = 12;
     }
 
     /**
@@ -86,18 +71,6 @@ class Table
     {
         return $this->_width;
     }
-
-    public function __construct($numColumns)
-    {
-        $this->_numColumns = $numColumns;
-
-        //set fonts
-        $this->_font = \Zend_Pdf_Font::FONT_COURIER;
-        $this->_fontSize = 10;
-        $this->_headerFont = \Zend_Pdf_Font::FONT_COURIER;
-        $this->_headerFontSize = 12;
-    }
-
 
     /**
      * Render Table
@@ -130,8 +103,7 @@ class Table
 
 
         $y = $start_y;
-        //prerender
-        /** @noinspection PhpParamsInspection */
+        //pre render
         $this->_preRender($page, $posX, $posY, $inContentArea);
         foreach ($this->_rows as $row) {
             //check current position (height)
@@ -141,7 +113,7 @@ class Table
                 //page-break
                 $nPage = new \Zend_Pdf_Page($page);
 
-                //copy previouse page-settings
+                //copy previous page-settings
                 $nPage->setFont($page->getFont(), $page->getFontSize());
                 $nPage->setMargins($page->getMargins());
 
@@ -166,7 +138,7 @@ class Table
     /**
      * Add Header Row
      *
-     * @param \sergeynezbritskiy\ZendPdfTable\Table\Row $row
+     * @param Row $row
      */
     public function setHeader(Table\Row $row)
     {
@@ -179,9 +151,9 @@ class Table
     /**
      * Add Row
      *
-     * @param \sergeynezbritskiy\ZendPdfTable\Table\Row $row
+     * @param Row $row
      */
-    public function addRow(Table\Row $row)
+    public function addRow(Row $row)
     {
         //add default row properties if non are set (font/color/size,...)
         //set width
@@ -194,10 +166,10 @@ class Table
     /**
      * Replace specific Row in Table
      *
-     * @param \sergeynezbritskiy\ZendPdfTable\Table\Row $row
+     * @param Row $row
      * @param int $index
      */
-    public function replaceRow(Table\Row $row, $index)
+    public function replaceRow(Row $row, $index)
     {
         if (!$this->_autoWidth)
             $row->setWidth($this->_width);
@@ -215,6 +187,9 @@ class Table
         return $this->_rows;
     }
 
+    /**
+     * @return void
+     */
     public function __clone()
     {
         foreach ($this as $key => $val) {
@@ -234,13 +209,13 @@ class Table
      */
     private function _preRender(\Zend_Pdf_Page $page, $posX, $posY, $inContentArea = true)
     {
-        //get auto-colum widths
+        //get auto-column widths
         $col_widths = array();
         foreach ($this->_rows as $row) {
             //check for colspan's
             $new_dummy_cells = array();
             foreach ($row->getColumns() as $idx => $col) {
-                $col_widths[$idx] = $col->getWidth(); //store widht ->for dummy cells
+                $col_widths[$idx] = $col->getWidth(); //store width ->for dummy cells
                 if ($col->getColspan() > 1) {
                     //insert new cell, for each spanning column
                     $new_dummy_cells[$idx] = $col;
@@ -251,7 +226,7 @@ class Table
             foreach ($new_dummy_cells as $idx => $col) {
                 for ($i = 1; $i < $col->getColspan(); $i++) {
                     //new col
-                    $nCol = new Table\Column();
+                    $nCol = new Column();
                     $nCol->setText('');
                     if (isset($col_widths[$idx + 1]))
                         $nCol->setWidth($col_widths[$idx + 1]);
@@ -277,13 +252,12 @@ class Table
             }
         }
 
-        //set uniform column widht for all rows
+        //set uniform column width for all rows
         foreach ($this->_rows as $row) {
             foreach ($row->getColumns() as $idx => $col) {
                 $col->setWidth($max_col_width[$idx]);
             }
         }
     }
-}
 
-?>
+}

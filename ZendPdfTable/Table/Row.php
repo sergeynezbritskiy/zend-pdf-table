@@ -31,14 +31,14 @@ class Row
      *
      * @var int
      */
-    public $NumColumns;
+    public $numColumns;
 
     /**
      * Add Cell Padding
      *
      * @param array [top,right,bottom,left] $values
      */
-    function setCellPaddings(array $values)
+    public function setCellPaddings(array $values)
     {
         $this->_cellPadding = $values;
     }
@@ -120,7 +120,7 @@ class Row
      *
      * @param bool $val
      */
-    public function forceUniformColumWidth($val = true)
+    public function forceUniformColumnWidth($val = true)
     {
         $this->_forceUniformColumnWidth = $val;
     }
@@ -167,7 +167,7 @@ class Row
     {
         $this->_cols = $columns;
 
-        $this->NumColumns = count($columns);
+        $this->numColumns = count($columns);
     }
 
     /**
@@ -184,7 +184,7 @@ class Row
      * Insert a new column between existing columns
      *
      * @param Column $col
-     * @param int $index of new Coumn $index
+     * @param int $index of new Column $index
      */
     public function insertColumn(Column $col, $index)
     {
@@ -201,7 +201,7 @@ class Row
 
         //reset cols
         $this->_cols = array_merge($begin, $end);
-        $this->NumColumns = count($this->_cols);
+        $this->numColumns = count($this->_cols);
     }
 
     public function __construct()
@@ -241,9 +241,9 @@ class Row
         }
 
         if ($this->_forceUniformColumnWidth) {
-            $uniform_width = $max_row_width / $this->NumColumns;
+            $uniform_width = $max_row_width / $this->numColumns;
         } else {
-            //check if some colums have specific widths
+            //check if some columns have specific widths
             $fixed_row_width = 0;
             $dynamic_columns = 0;
             $dynamic_row_width = 0;
@@ -271,7 +271,7 @@ class Row
                 $uniform_width = ($max_row_width - $fixed_row_width) / $dynamic_columns;
                 $free_width = $free_width / $dynamic_columns;
             } else {
-                //nothing to distribute (all fixed colum widths)
+                //nothing to distribute (all fixed column widths)
                 $free_width = -1;
             }
 
@@ -288,7 +288,7 @@ class Row
         foreach ($this->_cols as $col) {
             //set width ->auto-width=true
             if (!$col->getWidth()) {
-                //calc width for colums without given width /aproximation
+                //calc width for columns without given width / approximation
                 if ($this->_forceUniformColumnWidth) {
                     $width = $uniform_width;
                 } else {
@@ -337,7 +337,7 @@ class Row
         if ($this->_autoHeight)
             $this->preRender($page, $posX, $posY);
 
-        //render cell (background, border, content)	
+        //render cell (background, border, content)
         $x = $posX;
         foreach ($this->_cols as $key => $col) {
             //check colspan;
@@ -352,7 +352,7 @@ class Row
             }
         }
 
-        //render cols sepeately (without dummy cells)
+        //render cols separately (without dummy cells)
         foreach ($this->_cols as $key => $col) {
             //set uniform height
             $col->setHeight($this->_height);
@@ -387,5 +387,3 @@ class Row
     }
 
 }
-
-?>
