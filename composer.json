@@ -10,7 +10,7 @@
     }
   ],
   "require": {
-    "magento/zendframework1": "^1.13"
+    "magento/zendframework1": ">=1.12.0"
   },
   "autoload": {
     "psr-4": {
