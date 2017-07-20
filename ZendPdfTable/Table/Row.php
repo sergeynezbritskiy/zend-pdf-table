@@ -7,11 +7,17 @@ use Zend_Pdf_Font;
 use Zend_Pdf_Resource_Font;
 use Zend_Pdf_Style;
 
+/**
+ * Class Row
+ *
+ * @package sergeynezbritskiy\ZendPdfTable\Table
+ */
 class Row
 {
 
     protected $_font;
     protected $_fontSize = 10;
+
     /**
      * @var Column[]
      */
@@ -31,7 +37,16 @@ class Row
      *
      * @var int
      */
-    public $numColumns;
+    private $numColumns;
+
+    /**
+     * Row constructor.
+     */
+    public function __construct()
+    {
+        //set default font
+        $this->_font = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_COURIER);
+    }
 
     /**
      * Add Cell Padding
@@ -202,12 +217,6 @@ class Row
         //reset cols
         $this->_cols = array_merge($begin, $end);
         $this->numColumns = count($this->_cols);
-    }
-
-    public function __construct()
-    {
-        //set default font
-        $this->_font = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_COURIER);
     }
 
     /**

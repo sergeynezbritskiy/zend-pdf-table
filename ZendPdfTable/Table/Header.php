@@ -6,22 +6,38 @@ use sergeynezbritskiy\ZendPdfTable\Table;
 use Zend_Pdf_Font;
 use Zend_Pdf_Style;
 
+/**
+ * Class Header
+ *
+ * @package sergeynezbritskiy\ZendPdfTable\Table
+ */
 class Header extends \sergeynezbritskiy\ZendPdfTable\Table\Row
 {
 
-    private $_align;
+    private $_hAlign;
     private $_vAlign;
 
+    /**
+     * @param $align
+     */
     public function setAlignment($align)
     {
-        $this->_align = $align;
+        $this->_hAlign = $align;
     }
 
+    /**
+     * @param $align
+     */
     public function setVAlignment($align)
     {
         $this->_vAlign = $align;
     }
 
+    /**
+     * Header constructor.
+     *
+     * @param array $labels
+     */
     public function __construct($labels = array())
     {
 
@@ -36,7 +52,7 @@ class Header extends \sergeynezbritskiy\ZendPdfTable\Table\Row
             $this->setColumns($cols);
 
         //set default alignment
-        $this->_align = Table::CENTER;
+        $this->_hAlign = Table::CENTER;
 
         //set default borders
         $style = new Zend_Pdf_Style();
@@ -49,6 +65,12 @@ class Header extends \sergeynezbritskiy\ZendPdfTable\Table\Row
         $this->_fontSize = 12;
     }
 
+    /**
+     * @param \Zend_Pdf_Page $page
+     * @param int $posX
+     * @param int $posY
+     * @param bool $inContentArea
+     */
     public function preRender(\Zend_Pdf_Page $page, $posX, $posY, $inContentArea = true)
     {
 
@@ -63,11 +85,9 @@ class Header extends \sergeynezbritskiy\ZendPdfTable\Table\Row
             }
 
             if (!$col->getAlignment())
-                $col->setAlignment($this->_align);
+                $col->setAlignment($this->_hAlign);
         }
 
         parent::preRender($page, $posX, $posY);
     }
 }
-
-?>

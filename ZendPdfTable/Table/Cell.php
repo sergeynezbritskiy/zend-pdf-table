@@ -10,6 +10,11 @@ use Zend_Pdf_Page;
 use Zend_Pdf_Resource_Font;
 use Zend_Pdf_Style;
 
+/**
+ * Class Cell
+ *
+ * @package sergeynezbritskiy\ZendPdfTable\Table
+ */
 class Cell
 {
 
@@ -84,11 +89,17 @@ class Cell
         }
     }
 
+    /**
+     * @return int
+     */
     public function getRecommendedWidth()
     {
         return $this->_recommendedWidth;
     }
 
+    /**
+     * @return int
+     */
     public function getRecommendedHeight()
     {
         return $this->_recommendedHeight;
@@ -170,6 +181,9 @@ class Cell
         $this->_vAlign = $align;
     }
 
+    /**
+     * @return int
+     */
     public function getVAlignment()
     {
         return $this->_vAlign;
@@ -525,8 +539,6 @@ class Cell
     }
 
     /**
-     * Enter description here...
-     *
      * @param string $text
      * @param int $maxWidth (optional, if not set (auto width) the max width is set by reference)
      * @return array line(text);
@@ -581,6 +593,11 @@ class Cell
         $this->_renderBorder($page, $posX, $posY);
     }
 
+    /**
+     * @param \Zend_Pdf_Page $page
+     * @param int $posX
+     * @param int $posY
+     */
     private function _renderText(\Zend_Pdf_Page $page, $posX, $posY)
     {
         if (!$this->_text) return;
@@ -727,6 +744,11 @@ class Cell
         return $page->drawLine($x1, $y1, $x2, $y2);
     }
 
+    /**
+     * @param \Zend_Pdf_Page $page
+     * @param int $posX
+     * @param int $posY
+     */
     private function _renderBackground(\Zend_Pdf_Page $page, $posX, $posY)
     {
         if (!$this->_bgColor) return;
@@ -811,6 +833,10 @@ class Cell
         return $y;
     }
 
+    /**
+     * @param int $posX
+     * @return float
+     */
     private function _getImagePosX($posX)
     {
         switch ($this->_hAlign) {
@@ -827,6 +853,10 @@ class Cell
         return $x;
     }
 
+    /**
+     * @param int $posY
+     * @return float
+     */
     private function _getImagePosY($posY)
     {
         switch ($this->_vAlign) {
@@ -843,6 +873,10 @@ class Cell
         return $y;
     }
 
+    /**
+     * @param int $position
+     * @return int
+     */
     private function _getBorderLineWidth($position)
     {
         if (isset($this->_border[$position])) {
@@ -854,6 +888,10 @@ class Cell
         return $width;
     }
 
+    /**
+     * @return \Zend_Pdf_Style
+     * @throws \Zend_Pdf_Exception
+     */
     private function getDefaultStyle()
     {
         $style = new Zend_Pdf_Style();
@@ -871,4 +909,3 @@ class Cell
 
 }
 
-?>
