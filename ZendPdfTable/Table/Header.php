@@ -2,7 +2,6 @@
 
 namespace sergeynezbritskiy\ZendPdfTable\Table;
 
-use sergeynezbritskiy\ZendPdfTable\Page;
 use sergeynezbritskiy\ZendPdfTable\Table;
 use Zend_Pdf_Font;
 use Zend_Pdf_Style;
@@ -50,7 +49,7 @@ class Header extends \sergeynezbritskiy\ZendPdfTable\Table\Row
         $this->_fontSize = 12;
     }
 
-    public function preRender(Page $page, $posX, $posY, $inContentArea = true)
+    public function preRender(\Zend_Pdf_Page $page, $posX, $posY, $inContentArea = true)
     {
 
         foreach ($this->_cols AS $col) {

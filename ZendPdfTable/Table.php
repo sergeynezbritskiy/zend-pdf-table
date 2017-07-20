@@ -139,7 +139,7 @@ class Table
 
             if ($test > $max_y || $row->hasPageBreak()) {
                 //page-break
-                $nPage = new \sergeynezbritskiy\ZendPdfTable\Page($page);
+                $nPage = new \Zend_Pdf_Page($page);
 
                 //copy previouse page-settings
                 $nPage->setFont($page->getFont(), $page->getFontSize());
@@ -227,12 +227,12 @@ class Table
     /**
      * Pre-Render Table
      *
-     * @param \sergeynezbritskiy\ZendPdfTable\Page $page
+     * @param \Zend_Pdf_Page $page
      * @param int $posX
      * @param int $posY
      * @param bool $inContentArea
      */
-    private function _preRender(\sergeynezbritskiy\ZendPdfTable\Page $page, $posX, $posY, $inContentArea = true)
+    private function _preRender(\Zend_Pdf_Page $page, $posX, $posY, $inContentArea = true)
     {
         //get auto-colum widths
         $col_widths = array();

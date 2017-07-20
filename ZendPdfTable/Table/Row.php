@@ -1,9 +1,7 @@
 <?php
 
 namespace sergeynezbritskiy\ZendPdfTable\Table;
-use sergeynezbritskiy\ZendPdfTable\Table\Column;
-use sergeynezbritskiy\ZendPdfTable\Pdf;
-use sergeynezbritskiy\ZendPdfTable\Page;
+
 use sergeynezbritskiy\ZendPdfTable\Table;
 use Zend_Pdf_Font;
 use Zend_Pdf_Resource_Font;
@@ -217,12 +215,12 @@ class Row
      * Set Column Widths
      * Get Column Height
      *
-     * @param Page $page
+     * @param \Zend_Pdf_Page $page
      * @param int $posX
      * @param int $posY
      * @param bool $inContentArea
      */
-    public function preRender(Page $page, $posX, $posY, $inContentArea = true)
+    public function preRender(\Zend_Pdf_Page $page, $posX, $posY, $inContentArea = true)
     {
         $uniform_width = $free_width = $force_line_breaking = $width = 0;
 
@@ -329,11 +327,11 @@ class Row
      * Render Row
      * Set Column- Width for Columns with Colspan>1
      *
-     * @param Page $page
+     * @param \Zend_Pdf_Page $page
      * @param int $posX
      * @param int $posY
      */
-    public function render(Page $page, $posX, $posY)
+    public function render(\Zend_Pdf_Page $page, $posX, $posY)
     {
         //get height
         if ($this->_autoHeight)

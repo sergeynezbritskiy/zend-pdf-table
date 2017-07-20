@@ -2,8 +2,6 @@
 
 namespace sergeynezbritskiy\ZendPdfTable\Table;
 
-use sergeynezbritskiy\ZendPdfTable\Pdf;
-use sergeynezbritskiy\ZendPdfTable\Page;
 use sergeynezbritskiy\ZendPdfTable\Table;
 use Zend_Exception;
 use Zend_Pdf_Color;
@@ -155,7 +153,7 @@ class Cell
     /**
      * Get Alienment
      *
-     * @return Pdf
+     * @return int
      */
     public function getAlignment()
     {
@@ -165,7 +163,7 @@ class Cell
     /**
      * Set Vertical Alignment
      *
-     * @param Pdf $align
+     * @param int $align
      */
     public function setVAlignment($align)
     {
@@ -289,8 +287,8 @@ class Cell
      * Add text to cell
      *
      * @param string $text
-     * @param Pdf $align Horizontal Alignment
-     * @param Pdf $valign Vertical Alignment
+     * @param int $align Horizontal Alignment
+     * @param int $valign Vertical Alignment
      */
     public function setText($text, $align = null, $valign = null)
     {
@@ -330,12 +328,12 @@ class Cell
      * Add image to cell
      *
      * @param string $filename full path
-     * @param Pdf $align Horizontal Alignment
-     * @param Pdf $valign Vertical Alignment
-     * @param float|int $scale between (0,1]
+     * @param int $align Horizontal Alignment
+     * @param int $valign Vertical Alignment
+     * @param float $scale between (0,1]
      * @throws \Zend_Exception
      */
-    public function setImage($filename, $align = null, $valign = null, $scale = 1)
+    public function setImage($filename, $align = null, $valign = null, $scale = 1.00)
     {
         $this->_image['filename'] = $filename;
 
@@ -350,14 +348,14 @@ class Cell
     /**
      * Pre-render cell to get recommended width and height
      *
-     * @param Page $page
+     * @param \Zend_Pdf_Page $page
      * @param int $posX
      * @param int $posY
      * @param bool $inContentArea
      * @throws \Zend_Exception
      * @throws \Zend_Pdf_Exception
      */
-    public function preRender(Page $page, $posX, /** @noinspection PhpUnusedParameterInspection */
+    public function preRender(\Zend_Pdf_Page $page, $posX, /** @noinspection PhpUnusedParameterInspection */
                               $posY, $inContentArea = true)
     {
         if (!$this->_width) {
@@ -571,11 +569,11 @@ class Cell
     /**
      * Render Cell
      *
-     * @param Page $page
+     * @param \Zend_Pdf_Page $page
      * @param int $posX
      * @param int $posY
      */
-    public function render(Page $page, $posX, $posY)
+    public function render(\Zend_Pdf_Page $page, $posX, $posY)
     {
         $this->_renderBackground($page, $posX, $posY);
         $this->_renderText($page, $posX, $posY);
@@ -583,7 +581,7 @@ class Cell
         $this->_renderBorder($page, $posX, $posY);
     }
 
-    private function _renderText(Page $page, $posX, $posY)
+    private function _renderText(\Zend_Pdf_Page $page, $posX, $posY)
     {
         if (!$this->_text) return;
 
@@ -653,7 +651,7 @@ class Cell
         return $page->drawText($text, $x1, $y1, $charEncoding);
     }
 
-    private function _renderImage(Page $page, $posX, $posY)
+    private function _renderImage(\Zend_Pdf_Page $page, $posX, $posY)
     {
         if (!$this->_image) return;
         $this->drawImage($page, $this->_image['image'], $this->_getImagePosX($posX), $this->_getImagePosY($posY), $this->_image['width'], $this->_image['height']);
@@ -670,7 +668,7 @@ class Cell
         $page->drawImage($image, $x1, $y1, $x2, $y2);
     }
 
-    private function _renderBorder(Page $page, $posX, $posY)
+    private function _renderBorder(\Zend_Pdf_Page $page, $posX, $posY)
     {
         if (!$this->_border) return;
 
@@ -717,7 +715,6 @@ class Cell
      * @param int $y1
      * @param int $x2
      * @param int $y2
-     * @param bool $inContentArea
      * @return \Zend_Pdf_Canvas_Interface
      */
     public function drawLine(\Zend_Pdf_Page $page, $x1, $y1, $x2, $y2)
@@ -730,7 +727,7 @@ class Cell
         return $page->drawLine($x1, $y1, $x2, $y2);
     }
 
-    private function _renderBackground(Page $page, $posX, $posY)
+    private function _renderBackground(\Zend_Pdf_Page $page, $posX, $posY)
     {
         if (!$this->_bgColor) return;
         $page->setFillColor($this->_bgColor);
@@ -752,7 +749,6 @@ class Cell
      * @param int $x2
      * @param int $y2
      * @param string $filltype
-     * @param bool $inContentArea
      * @return \Zend_Pdf_Canvas_Interface
      */
     public function drawRectangle(\Zend_Pdf_Page $page, $x1, $y1, $x2, $y2, $filltype = null)
@@ -793,11 +789,11 @@ class Cell
      * Positions text vertically (y-axis) adding vertical alignment
      * Default alignment: TOP
      *
-     * @param Page $page
+     * @param \Zend_Pdf_Page $page
      * @param int $posY
      * @return int
      */
-    private function _getTextPosY(Page $page, $posY)
+    private function _getTextPosY(\Zend_Pdf_Page $page, $posY)
     {
         $line_height = $this->getFontHeight($page) + $this->_textLineSpacing;
 
