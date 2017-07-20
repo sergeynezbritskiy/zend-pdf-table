@@ -20,6 +20,10 @@ class Cell
     private $_recommendedWidth;
     private $_recommendedHeight;
     private $_text;
+
+    /**
+     * @var Zend_Pdf_Resource_Font
+     */
     private $_font;
     private $_fontSize = 10;
     private $_align;
@@ -376,7 +380,7 @@ class Cell
             $page->setFont($this->_font, $this->_fontSize);
 
             //get height,width,lines
-            $text_props = $page->getTextProperties($this->_text['text'], $maxWidth);
+            $text_props = $this->getTextProperties($page, $this->_text['text'], $maxWidth);
 
             //reset style
             $page->setStyle($this->getDefaultStyle());
@@ -422,6 +426,149 @@ class Cell
     }
 
     /**
+     * Get text properties (width, height, [#lines using $max Width]), and warps lines
+     *
+     * @param Zend_Pdf_Page $page
+     * @param string $text
+     * @param int $maxWidth
+     * @return array
+     */
+    public function getTextProperties($page, $text, $maxWidth = null)
+    {
+
+        $lines = $this->_textLines($text, $maxWidth);
+
+        return array(
+            'text_width' => $lines['text_width'],
+            'max_width' => $lines['max_width'],
+            'height' => ($this->getFontHeight($page) * count($lines['lines'])),
+            'lines' => $lines['lines']
+        );
+    }
+
+    /**
+     * Get Font Height
+     *
+     * @param \Zend_Pdf_Page $page
+     * @return int
+     */
+    public function getFontHeight($page)
+    {
+        $line_height = $page->getFont()->getLineHeight();
+        $line_gap = $page->getFont()->getLineGap();
+        $em = $page->getFont()->getUnitsPerEm();
+        $size = $page->getFontSize();
+        return ($line_height - $line_gap) / $em * $size;
+    }
+
+
+    /**
+     * Returns the with of the text
+     *
+     * @param string $text
+     * @return int $width
+     */
+    private function _getTextWidth($text)
+    {
+
+        $glyphs = array();
+        $em = $this->_font->getUnitsPerEm();
+
+        //get glyph for each character
+        foreach (range(0, strlen($text) - 1) as $i) {
+            $glyphs [] = @ord($text [$i]);
+        }
+
+        $width = array_sum($this->_font->widthsForGlyphs($glyphs)) / $em * $this->_fontSize;
+
+        return $width;
+    }
+
+    /**
+     * Wrap text according to max width
+     *
+     * @param string $text
+     * @param int $maxWidth
+     * @return array lines
+     */
+    private function _wrapText($text, $maxWidth)
+    {
+        $x_inc = 0;
+        $curr_line = '';
+        $words = explode(' ', trim($text));
+        $space_width = $this->_getTextWidth(' ');
+        foreach ($words as $word) {
+            //no new line found
+            $width = $this->_getTextWidth($word);
+
+            if (isset ($maxWidth) && ($x_inc + $width) <= $maxWidth) {
+                //add word to current line
+                $curr_line .= ' ' . $word;
+                $x_inc += $width + $space_width;
+            } else {
+                //store current line
+                if (strlen(trim($curr_line, "\n")) > 0)
+                    $lines [] = trim($curr_line);
+
+                //new line
+                $x_inc = 0; //reset position
+                //add word
+                $curr_line = $word;
+                $x_inc += $width + $space_width;
+            }
+        }
+
+        $lines = [];
+        //last line
+        if (strlen(trim($curr_line, "\n")) > 0) {
+            $lines [] = trim($curr_line);
+        }
+        return $lines;
+    }
+
+    /**
+     * Enter description here...
+     *
+     * @param string $text
+     * @param int $maxWidth (optional, if not set (auto width) the max width is set by reference)
+     * @return array line(text);
+     */
+    private function _textLines($text, $maxWidth = null)
+    {
+        $trimmed_lines = array();
+
+        $lines = explode("\n", $text);
+        $max_line_width = 0;
+        foreach ($lines as $line) {
+            if (strlen($line) <= 0) continue;
+            $line_width = $this->_getTextWidth($line);
+            if ($maxWidth > 0 && $line_width > $maxWidth) {
+                $new_lines = $this->_wrapText($line, $maxWidth);
+                $trimmed_lines += $new_lines;
+
+                foreach ($new_lines as $nline) {
+                    $line_width = $this->_getTextWidth($nline);
+                    if ($line_width > $max_line_width)
+                        $max_line_width = $line_width;
+                }
+            } else {
+                $trimmed_lines[] = $line;
+            }
+            if ($line_width > $max_line_width)
+                $max_line_width = $line_width;
+        }
+
+        //set actual width of line
+        if (is_null($maxWidth))
+            $maxWidth = $max_line_width;
+
+        $textWidth = $max_line_width;
+
+
+        return array('lines' => $trimmed_lines, 'text_width' => $textWidth, 'max_width' => $maxWidth);
+    }
+
+    /**
      * Render Cell
      *
      * @param Page $page
@@ -447,7 +594,7 @@ class Cell
 
         if (count($this->_text['lines']) > 1) {
 
-            $line_height = $page->getFontHeight() + $this->_textLineSpacing;
+            $line_height = $this->getFontHeight($page) + $this->_textLineSpacing;
             /*
             //write multi-line text
             switch ($this->_vAlign){
@@ -473,24 +620,54 @@ class Cell
             $y_inc = $posY - $this->_textLineSpacing; //@@TODO HACK
             $this->_vAlign = Table::TOP; //@@TODO ONLY TOP ALIGNEMENT IS VALID AT THIS MOMENT
             foreach ($this->_text['lines'] as $line) {
-                $page->drawText($line, $this->_getTextPosX($posX), $this->_getTextPosY($page, $y_inc));
+                $this->drawText($page, $line, $this->_getTextPosX($posX), $this->_getTextPosY($page, $y_inc));
                 $y_inc += $line_height;
             }
 
 
         } else {
             //write single line of text
-            $page->drawText($this->_text['text'], $this->_getTextPosX($posX), $this->_getTextPosY($page, $posY));
+            $this->drawText($page, $this->_text['text'], $this->_getTextPosX($posX), $this->_getTextPosY($page, $posY));
         }
         //reset style
         $page->setStyle($this->getDefaultStyle());
     }
 
+    /**
+     * Draw Text
+     *
+     * @param \Zend_Pdf_Page $page
+     * @param string $text
+     * @param int $x1
+     * @param int $y1
+     * @param string $charEncoding
+     * @return \Zend_Pdf_Canvas_Interface
+     * @throws \Zend_Pdf_Exception
+     * @internal param bool $inContentArea
+     */
+    public function drawText(\Zend_Pdf_Page $page, $text, $x1, $y1, $charEncoding = "")
+    {
+        //move origin
+        $y1 = $page->getHeight() - $y1 - $page->getMargin(Table::TOP);
+        $x1 = $x1 + $page->getMargin(Table::LEFT);
+        return $page->drawText($text, $x1, $y1, $charEncoding);
+    }
+
     private function _renderImage(Page $page, $posX, $posY)
     {
         if (!$this->_image) return;
-        $page->drawImage($this->_image['image'], $this->_getImagePosX($posX), $this->_getImagePosY($posY), $this->_image['width'], $this->_image['height']);
+        $this->drawImage($page, $this->_image['image'], $this->_getImagePosX($posX), $this->_getImagePosY($posY), $this->_image['width'], $this->_image['height']);
 
+    }
+
+    public function drawImage(\Zend_Pdf_Page $page, \Zend_Pdf_Resource_Image $image, $x1, $y1, $width, $height)
+    {
+        $y1 = $page->getHeight() - $y1 - $page->getMargin(Table::TOP) - $height;
+        $x1 = $x1 + $page->getMargin(Table::LEFT);
+
+        $y2 = $y1 + $height;
+        $x2 = $x1 + $width;
+        $page->drawImage($image, $x1, $y1, $x2, $y2);
     }
 
     private function _renderBorder(Page $page, $posX, $posY)
@@ -501,14 +678,14 @@ class Cell
             $page->setStyle($style);
             switch ($key) {
                 case Table::TOP:
-                    $page->drawLine(
+                    $this->drawLine($page,
                         $posX, $posY - $this->_getBorderLineWidth(Table::TOP) / 2,
                         $posX + $this->_width, $posY - $this->_getBorderLineWidth(Table::TOP) / 2,
                         true
                     );
                     break;
                 case Table::BOTTOM:
-                    $page->drawLine(
+                    $this->drawLine($page,
                         $posX, $posY + $this->_height + $this->_getBorderLineWidth(Table::BOTTOM) / 2,
                         $posX + $this->_width, $posY + $this->_height + $this->_getBorderLineWidth(Table::BOTTOM) / 2,
                         true
@@ -516,7 +693,7 @@ class Cell
                     break;
                 case Table::RIGHT:
                     //@@TODO INCLUDE BORDER LINE WIDTH??
-                    $page->drawLine(
+                    $this->drawLine($page,
                         $posX + $this->_width, $posY,
                         $posX + $this->_width, $posY + $this->_height,
                         true
@@ -524,7 +701,7 @@ class Cell
                     break;
                 case Table::LEFT:
                     //@@TODO INCLUDE BORDER LINE WIDTH??
-                    $page->drawLine(
+                    $this->drawLine($page,
                         $posX, $posY,
                         $posX, $posY + $this->_height,
                         true
@@ -536,17 +713,61 @@ class Cell
         }
     }
 
+    /**
+     * Draw Line
+     *
+     * @param \Zend_Pdf_Page $page
+     * @param int $x1
+     * @param int $y1
+     * @param int $x2
+     * @param int $y2
+     * @param bool $inContentArea
+     * @return \Zend_Pdf_Canvas_Interface
+     */
+    public function drawLine(\Zend_Pdf_Page $page, $x1, $y1, $x2, $y2, $inContentArea = true)
+    {
+            $y1 = $page->getHeight() - $y1 - $page->getMargin(Table::TOP);
+            $y2 = $page->getHeight() - $y2 - $page->getMargin(Table::TOP);
+            $x1 = $x1 + $page->getMargin(Table::LEFT);
+            $x2 = $x2 + $page->getMargin(Table::LEFT);
+
+        return $page->drawLine($x1, $y1, $x2, $y2);
+    }
+
     private function _renderBackground(Page $page, $posX, $posY)
     {
         if (!$this->_bgColor) return;
         $page->setFillColor($this->_bgColor);
-        $page->drawRectangle($posX,
+        $this->drawRectangle($page, $posX,
             $posY,
             $posX + $this->_width,
             $posY + $this->_height,
             Zend_Pdf_Page::SHAPE_DRAW_FILL);
         //reset style
         $page->setStyle($this->getDefaultStyle());
+    }
+
+    /**
+     * Draw Rectangle
+     *
+     * @param \Zend_Pdf_Page $page
+     * @param int $x1
+     * @param int $y1
+     * @param int $x2
+     * @param int $y2
+     * @param string $filltype
+     * @param bool $inContentArea
+     * @return \Zend_Pdf_Canvas_Interface
+     */
+    public function drawRectangle(\Zend_Pdf_Page $page, $x1, $y1, $x2, $y2, $filltype = null, $inContentArea = true)
+    {
+        //move origin
+        $y1 = $page->getHeight() - $y1 - $page->getMargin(Table::TOP);
+        $y2 = $page->getHeight() - $y2 - $page->getMargin(Table::TOP);
+        $x1 = $x1 + $page->getMargin(Table::LEFT);
+        $x2 = $x2 + $page->getMargin(Table::LEFT);
+
+        return $page->drawRectangle($x1, $y1, $x2, $y2, $filltype);
     }
 
     /**
@@ -582,7 +803,7 @@ class Cell
      */
     private function _getTextPosY(Page $page, $posY)
     {
-        $line_height = $page->getFontHeight() + $this->_textLineSpacing;
+        $line_height = $this->getFontHeight($page) + $this->_textLineSpacing;
 
         switch ($this->_vAlign) {
             case Table::BOTTOM:

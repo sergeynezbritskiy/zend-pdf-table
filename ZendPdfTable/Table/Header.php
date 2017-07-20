@@ -2,8 +2,6 @@
 
 namespace sergeynezbritskiy\ZendPdfTable\Table;
 
-use sergeynezbritskiy\ZendPdfTable\Table\Column;
-use sergeynezbritskiy\ZendPdfTable\Pdf;
 use sergeynezbritskiy\ZendPdfTable\Page;
 use sergeynezbritskiy\ZendPdfTable\Table;
 use Zend_Pdf_Font;
