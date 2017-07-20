@@ -1,0 +1,11 @@
+{
+    "name": "sergeynezbritskiy/zend-pdf-table",
+    "description": "Extension for Zend_Pdf library, which can help you to draw tables",
+    "authors": [
+        {
+            "name": "Sergey Nezbritskiy",
+            "email": "admin@sergeynezbritskiy.com"
+        }
+    ],
+    "require": {}
+}
