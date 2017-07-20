@@ -1,6 +1,8 @@
 {
   "name": "sergeynezbritskiy/zend-pdf-table",
   "description": "Extension for Zend_Pdf library, which can help you to draw tables. This is just an updated version of Zend_Pdf_Table Component which can be found here https://sourceforge.net/projects/zendpdftable/",
+  "type": "library",
+  "license": "MIT",
   "authors": [
     {
       "name": "Sergey Nezbritskiy",
@@ -9,5 +11,10 @@
   ],
   "require": {
     "magento/zendframework1": "^1.13"
+  },
+  "autoload": {
+    "psr-4": {
+      "sergeynezbritskiy\\ZendPdfTable\\": "src/"
+    }
   }
 }
