@@ -680,31 +680,27 @@ class Cell
                 case Table::TOP:
                     $this->drawLine($page,
                         $posX, $posY - $this->_getBorderLineWidth(Table::TOP) / 2,
-                        $posX + $this->_width, $posY - $this->_getBorderLineWidth(Table::TOP) / 2,
-                        true
+                        $posX + $this->_width, $posY - $this->_getBorderLineWidth(Table::TOP) / 2
                     );
                     break;
                 case Table::BOTTOM:
                     $this->drawLine($page,
                         $posX, $posY + $this->_height + $this->_getBorderLineWidth(Table::BOTTOM) / 2,
-                        $posX + $this->_width, $posY + $this->_height + $this->_getBorderLineWidth(Table::BOTTOM) / 2,
-                        true
+                        $posX + $this->_width, $posY + $this->_height + $this->_getBorderLineWidth(Table::BOTTOM) / 2
                     );
                     break;
                 case Table::RIGHT:
                     //@@TODO INCLUDE BORDER LINE WIDTH??
                     $this->drawLine($page,
                         $posX + $this->_width, $posY,
-                        $posX + $this->_width, $posY + $this->_height,
-                        true
+                        $posX + $this->_width, $posY + $this->_height
                     );
                     break;
                 case Table::LEFT:
                     //@@TODO INCLUDE BORDER LINE WIDTH??
                     $this->drawLine($page,
                         $posX, $posY,
-                        $posX, $posY + $this->_height,
-                        true
+                        $posX, $posY + $this->_height
                     );
                     break;
             }
@@ -724,12 +720,12 @@ class Cell
      * @param bool $inContentArea
      * @return \Zend_Pdf_Canvas_Interface
      */
-    public function drawLine(\Zend_Pdf_Page $page, $x1, $y1, $x2, $y2, $inContentArea = true)
+    public function drawLine(\Zend_Pdf_Page $page, $x1, $y1, $x2, $y2)
     {
-            $y1 = $page->getHeight() - $y1 - $page->getMargin(Table::TOP);
-            $y2 = $page->getHeight() - $y2 - $page->getMargin(Table::TOP);
-            $x1 = $x1 + $page->getMargin(Table::LEFT);
-            $x2 = $x2 + $page->getMargin(Table::LEFT);
+        $y1 = $page->getHeight() - $y1 - $page->getMargin(Table::TOP);
+        $y2 = $page->getHeight() - $y2 - $page->getMargin(Table::TOP);
+        $x1 = $x1 + $page->getMargin(Table::LEFT);
+        $x2 = $x2 + $page->getMargin(Table::LEFT);
 
         return $page->drawLine($x1, $y1, $x2, $y2);
     }
@@ -759,7 +755,7 @@ class Cell
      * @param bool $inContentArea
      * @return \Zend_Pdf_Canvas_Interface
      */
-    public function drawRectangle(\Zend_Pdf_Page $page, $x1, $y1, $x2, $y2, $filltype = null, $inContentArea = true)
+    public function drawRectangle(\Zend_Pdf_Page $page, $x1, $y1, $x2, $y2, $filltype = null)
     {
         //move origin
         $y1 = $page->getHeight() - $y1 - $page->getMargin(Table::TOP);
@@ -818,7 +814,6 @@ class Cell
         }
         return $y;
     }
-
 
     private function _getImagePosX($posX)
     {
