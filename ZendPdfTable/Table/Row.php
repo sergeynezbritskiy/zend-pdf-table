@@ -1,9 +1,10 @@
 <?php
 
 namespace sergeynezbritskiy\ZendPdfTable\Table;
-use sergeynezbritskiy\ZendPdf\Table\Column;
+use sergeynezbritskiy\ZendPdfTable\Table\Column;
 use sergeynezbritskiy\ZendPdfTable\Pdf;
 use sergeynezbritskiy\ZendPdfTable\Page;
+use sergeynezbritskiy\ZendPdfTable\Table;
 use Zend_Pdf_Font;
 use Zend_Pdf_Resource_Font;
 use Zend_Pdf_Style;
@@ -58,7 +59,7 @@ class Row
     /**
      * Get Row Columns
      *
-     * @return \sergeynezbritskiy\ZendPdf\Table\Column[]
+     * @return \sergeynezbritskiy\ZendPdfTable\Table\Column[]
      */
     public function getColumns()
     {
@@ -235,7 +236,7 @@ class Row
         } else {
             //no width given, use available page width
             if ($inContentArea) {
-                $max_row_width = $page->getWidth() - $page->getMargin(Pdf::LEFT) - $page->getMargin(Pdf::RIGHT);
+                $max_row_width = $page->getWidth() - $page->getMargin(Table::LEFT) - $page->getMargin(Table::RIGHT);
             } else {
                 $max_row_width = $page->getWidth();
             }

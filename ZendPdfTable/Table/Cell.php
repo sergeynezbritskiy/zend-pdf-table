@@ -4,6 +4,7 @@ namespace sergeynezbritskiy\ZendPdfTable\Table;
 
 use sergeynezbritskiy\ZendPdfTable\Pdf;
 use sergeynezbritskiy\ZendPdfTable\Page;
+use sergeynezbritskiy\ZendPdfTable\Table;
 use Zend_Exception;
 use Zend_Pdf_Color;
 use Zend_Pdf_Image;
@@ -358,7 +359,7 @@ class Cell
         if (!$this->_width) {
             //no width given, get max width of page
             if ($inContentArea) {
-                $width = $page->getWidth() - $posX - ($page->getMargin(Pdf::LEFT) + $page->getMargin(Pdf::RIGHT));
+                $width = $page->getWidth() - $posX - ($page->getMargin(Table::LEFT) + $page->getMargin(Table::RIGHT));
             } else {
                 $width = $page->getWidth() - $posX;
             }
@@ -367,7 +368,7 @@ class Cell
         }
 
         //calc max cell width
-        $maxWidth = $width - ($this->_padding[Pdf::LEFT] + $this->_padding[Pdf::RIGHT]) - (+$this->_getBorderLineWidth(Pdf::LEFT) + $this->_getBorderLineWidth(Pdf::RIGHT));
+        $maxWidth = $width - ($this->_padding[Table::LEFT] + $this->_padding[Table::RIGHT]) - (+$this->_getBorderLineWidth(Table::LEFT) + $this->_getBorderLineWidth(Table::RIGHT));
 
         if ($this->_text) {
 
@@ -383,7 +384,7 @@ class Cell
             //set width
             if (!$this->_width) {
                 //add padding
-                $this->_recommendedWidth = $text_props['text_width'] + ($this->_padding[Pdf::LEFT] + $this->_padding[Pdf::RIGHT]) + $this->_getBorderLineWidth(Pdf::LEFT) + $this->_getBorderLineWidth(Pdf::RIGHT);
+                $this->_recommendedWidth = $text_props['text_width'] + ($this->_padding[Table::LEFT] + $this->_padding[Table::RIGHT]) + $this->_getBorderLineWidth(Table::LEFT) + $this->_getBorderLineWidth(Table::RIGHT);
             } else {
                 $this->_recommendedWidth = $text_props['max_width'];
             }
@@ -395,7 +396,7 @@ class Cell
                 } else {
                     $height = $text_props['height'];
                 }
-                $this->_recommendedHeight = $height + ($this->_padding[Pdf::TOP] + $this->_padding[Pdf::BOTTOM]);
+                $this->_recommendedHeight = $height + ($this->_padding[Table::TOP] + $this->_padding[Table::BOTTOM]);
             }
 
             //store text props;
@@ -408,9 +409,9 @@ class Cell
             $image = Zend_Pdf_Image::imageWithPath($this->_image['filename']);
 
             if (!$this->_width)
-                $this->_recommendedWidth = $this->_image['scale'] * $image->getPixelWidth() + ($this->_padding[Pdf::LEFT] + $this->_padding[Pdf::RIGHT]) + $this->_getBorderLineWidth(Pdf::LEFT) + $this->_getBorderLineWidth(Pdf::RIGHT);
+                $this->_recommendedWidth = $this->_image['scale'] * $image->getPixelWidth() + ($this->_padding[Table::LEFT] + $this->_padding[Table::RIGHT]) + $this->_getBorderLineWidth(Table::LEFT) + $this->_getBorderLineWidth(Table::RIGHT);
             if (!$this->_height)
-                $this->_recommendedHeight = $this->_image['scale'] * $image->getPixelHeight() + ($this->_padding[Pdf::TOP] + $this->_padding[Pdf::BOTTOM]);
+                $this->_recommendedHeight = $this->_image['scale'] * $image->getPixelHeight() + ($this->_padding[Table::TOP] + $this->_padding[Table::BOTTOM]);
 
             $this->_image['image'] = $image;
             $this->_image['width'] = $this->_image['scale'] * $image->getPixelWidth();
@@ -470,7 +471,7 @@ class Cell
 
             //@@TODO VERTICAL POSITIONING OF MULTI-LINED TEXT
             $y_inc = $posY - $this->_textLineSpacing; //@@TODO HACK
-            $this->_vAlign = Pdf::TOP; //@@TODO ONLY TOP ALIGNEMENT IS VALID AT THIS MOMENT
+            $this->_vAlign = Table::TOP; //@@TODO ONLY TOP ALIGNEMENT IS VALID AT THIS MOMENT
             foreach ($this->_text['lines'] as $line) {
                 $page->drawText($line, $this->_getTextPosX($posX), $this->_getTextPosY($page, $y_inc));
                 $y_inc += $line_height;
@@ -499,21 +500,21 @@ class Cell
         foreach ($this->_border as $key => $style) {
             $page->setStyle($style);
             switch ($key) {
-                case Pdf::TOP:
+                case Table::TOP:
                     $page->drawLine(
-                        $posX, $posY - $this->_getBorderLineWidth(Pdf::TOP) / 2,
-                        $posX + $this->_width, $posY - $this->_getBorderLineWidth(Pdf::TOP) / 2,
+                        $posX, $posY - $this->_getBorderLineWidth(Table::TOP) / 2,
+                        $posX + $this->_width, $posY - $this->_getBorderLineWidth(Table::TOP) / 2,
                         true
                     );
                     break;
-                case Pdf::BOTTOM:
+                case Table::BOTTOM:
                     $page->drawLine(
-                        $posX, $posY + $this->_height + $this->_getBorderLineWidth(Pdf::BOTTOM) / 2,
-                        $posX + $this->_width, $posY + $this->_height + $this->_getBorderLineWidth(Pdf::BOTTOM) / 2,
+                        $posX, $posY + $this->_height + $this->_getBorderLineWidth(Table::BOTTOM) / 2,
+                        $posX + $this->_width, $posY + $this->_height + $this->_getBorderLineWidth(Table::BOTTOM) / 2,
                         true
                     );
                     break;
-                case Pdf::RIGHT:
+                case Table::RIGHT:
                     //@@TODO INCLUDE BORDER LINE WIDTH??
                     $page->drawLine(
                         $posX + $this->_width, $posY,
@@ -521,7 +522,7 @@ class Cell
                         true
                     );
                     break;
-                case Pdf::LEFT:
+                case Table::LEFT:
                     //@@TODO INCLUDE BORDER LINE WIDTH??
                     $page->drawLine(
                         $posX, $posY,
@@ -558,14 +559,14 @@ class Cell
     private function _getTextPosX($posX)
     {
         switch ($this->_align) {
-            case Pdf::RIGHT:
-                $x = $posX + $this->_width - $this->_text['width'] - $this->_padding[Pdf::RIGHT] - $this->_getBorderLineWidth(Pdf::RIGHT) / 2;
+            case Table::RIGHT:
+                $x = $posX + $this->_width - $this->_text['width'] - $this->_padding[Table::RIGHT] - $this->_getBorderLineWidth(Table::RIGHT) / 2;
                 break;
-            case Pdf::CENTER:
+            case Table::CENTER:
                 $x = $posX + $this->_width / 2 - $this->_text['width'] / 2;
                 break;
             default: //LEFT
-                $x = $posX + $this->_padding[Pdf::LEFT] + $this->_getBorderLineWidth(Pdf::LEFT) / 2;
+                $x = $posX + $this->_padding[Table::LEFT] + $this->_getBorderLineWidth(Table::LEFT) / 2;
                 break;
         }
         return $x;
@@ -584,14 +585,14 @@ class Cell
         $line_height = $page->getFontHeight() + $this->_textLineSpacing;
 
         switch ($this->_vAlign) {
-            case Pdf::BOTTOM:
-                $y = $posY + $this->_height - $this->_padding[Pdf::BOTTOM];
+            case Table::BOTTOM:
+                $y = $posY + $this->_height - $this->_padding[Table::BOTTOM];
                 break;
-            case Pdf::MIDDLE:
+            case Table::MIDDLE:
                 $y = $posY + $this->_height / 2 + $line_height / 2;
                 break;
             default: //TOP
-                $y = $posY + $line_height + $this->_padding[Pdf::TOP];
+                $y = $posY + $line_height + $this->_padding[Table::TOP];
                 break;
         }
         return $y;
@@ -601,14 +602,14 @@ class Cell
     private function _getImagePosX($posX)
     {
         switch ($this->_align) {
-            case Pdf::RIGHT:
-                $x = $posX + $this->_width - $this->_image['width'] - $this->_padding[Pdf::RIGHT];
+            case Table::RIGHT:
+                $x = $posX + $this->_width - $this->_image['width'] - $this->_padding[Table::RIGHT];
                 break;
-            case Pdf::CENTER:
+            case Table::CENTER:
                 $x = $posX + $this->_width / 2 - $this->_image['width'] / 2;
                 break;
             default: //LEFT
-                $x = $posX + $this->_padding[Pdf::LEFT];
+                $x = $posX + $this->_padding[Table::LEFT];
                 break;
         }
         return $x;
@@ -617,14 +618,14 @@ class Cell
     private function _getImagePosY($posY)
     {
         switch ($this->_vAlign) {
-            case Pdf::BOTTOM:
-                $y = $posY + $this->_height - $this->_image['height'] - $this->_padding[Pdf::BOTTOM];
+            case Table::BOTTOM:
+                $y = $posY + $this->_height - $this->_image['height'] - $this->_padding[Table::BOTTOM];
                 break;
-            case Pdf::MIDDLE:
+            case Table::MIDDLE:
                 $y = $posY + ($this->_height - $this->_image['height']) / 2;
                 break;
             default: //TOP
-                $y = $posY + $this->_padding[Pdf::TOP];
+                $y = $posY + $this->_padding[Table::TOP];
                 break;
         }
         return $y;

@@ -9,6 +9,13 @@ namespace sergeynezbritskiy\ZendPdfTable;
  */
 class Table
 {
+    const TOP = 0;
+    const RIGHT = 1;
+    const BOTTOM = 2;
+    const LEFT = 3;
+    const CENTER = 4;
+    const MIDDLE = 5;
+
     private $_width;
     private $_autoWidth = true;
     private $_font;
@@ -79,12 +86,12 @@ class Table
         }
 
         if ($inContentArea) {
-            $start_y = $posY + $page->getMargin(\sergeynezbritskiy\ZendPdfTable\Pdf::TOP);
-            $max_y = $page->getHeight() - $page->getMargin(\sergeynezbritskiy\ZendPdfTable\Pdf::BOTTOM) - $page->getMargin(\sergeynezbritskiy\ZendPdfTable\Pdf::TOP);
+            $start_y = $posY + $page->getMargin(self::TOP);
+            $max_y = $page->getHeight() - $page->getMargin(self::BOTTOM) - $page->getMargin(self::TOP);
         } else {
             $start_y = $posY;
             $max_y = $page->getHeight();
-            $posX -= $page->getMargin(\sergeynezbritskiy\ZendPdfTable\Pdf::LEFT);
+            $posX -= $page->getMargin(self::LEFT);
         }
 
 
@@ -106,17 +113,17 @@ class Table
 
                 $page = $nPage;
                 $this->_pages[] = $page;
-                $y = $page->getMargin(\sergeynezbritskiy\ZendPdfTable\Pdf::TOP);
+                $y = $page->getMargin(self::TOP);
 
                 if ($this->_headerRow && $this->_repeatHeader) {
                     $header = $this->_rows[0];//pre-rendered header row (is first row)
                     $header->render($page, $posX, $y);
-                    $y += $header->getHeight() + $header->getBorderLineWidth(\sergeynezbritskiy\ZendPdfTable\Pdf::BOTTOM);
+                    $y += $header->getHeight() + $header->getBorderLineWidth(self::BOTTOM);
                 }
             }
 
             $row->render($page, $posX, $y);
-            $y += $row->getHeight() + $row->getBorderLineWidth(\sergeynezbritskiy\ZendPdfTable\Pdf::BOTTOM);
+            $y += $row->getHeight() + $row->getBorderLineWidth(self::BOTTOM);
         }
 
         return $this->_pages;
@@ -210,7 +217,7 @@ class Table
             foreach ($new_dummy_cells as $idx => $col) {
                 for ($i = 1; $i < $col->getColspan(); $i++) {
                     //new col
-                    $nCol = new \sergeynezbritskiy\ZendPdf\Table\Column();
+                    $nCol = new Table\Column();
                     $nCol->setText('');
                     if (isset($col_widths[$idx + 1]))
                         $nCol->setWidth($col_widths[$idx + 1]);
@@ -221,7 +228,7 @@ class Table
 
             //pre-render row
             $row->preRender($page, $posX, $posY, $inContentArea);
-            $posY += $row->getHeight() + $row->getBorderLineWidth(\sergeynezbritskiy\ZendPdfTable\Pdf::BOTTOM);
+            $posY += $row->getHeight() + $row->getBorderLineWidth(self::BOTTOM);
         }
 
         //set max col width

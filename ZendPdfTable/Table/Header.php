@@ -2,9 +2,10 @@
 
 namespace sergeynezbritskiy\ZendPdfTable\Table;
 
-use sergeynezbritskiy\ZendPdf\Table\Column;
+use sergeynezbritskiy\ZendPdfTable\Table\Column;
 use sergeynezbritskiy\ZendPdfTable\Pdf;
 use sergeynezbritskiy\ZendPdfTable\Page;
+use sergeynezbritskiy\ZendPdfTable\Table;
 use Zend_Pdf_Font;
 use Zend_Pdf_Style;
 
@@ -38,12 +39,12 @@ class Header extends \sergeynezbritskiy\ZendPdfTable\Table\Row
             $this->setColumns($cols);
 
         //set default alignment
-        $this->_align = Pdf::CENTER;
+        $this->_align = Table::CENTER;
 
         //set default borders
         $style = new Zend_Pdf_Style();
         $style->setLineWidth(2);
-        $this->setBorder(Pdf::BOTTOM, $style);
+        $this->setBorder(Table::BOTTOM, $style);
         $this->setCellPaddings(array(5, 5, 5, 5));
 
         //set default font

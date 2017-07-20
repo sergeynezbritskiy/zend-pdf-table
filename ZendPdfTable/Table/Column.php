@@ -1,8 +1,6 @@
 <?php
 
-namespace sergeynezbritskiy\ZendPdf\Table;
-
-use sergeynezbritskiy\ZendPdfTable\Table\Cell;
+namespace sergeynezbritskiy\ZendPdfTable\Table;
 
 class Column extends Cell
 {

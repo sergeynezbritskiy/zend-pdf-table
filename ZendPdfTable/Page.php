@@ -2,9 +2,13 @@
 
 namespace sergeynezbritskiy\ZendPdfTable;
 
-use Zend_Pdf_Page;
-
-class Page extends Zend_Pdf_Page
+/**
+ * Class Page
+ *
+ * @package sergeynezbritskiy\ZendPdfTable
+ * @deprecated
+ */
+class Page extends \Zend_Pdf_Page
 {
 
     /*
@@ -93,10 +97,10 @@ class Page extends Zend_Pdf_Page
     {
         //move origin
         if ($inContentArea) {
-            $y1 = $this->getHeight() - $y1 - $this->getMargin(Pdf::TOP);
-            $y2 = $this->getHeight() - $y2 - $this->getMargin(Pdf::TOP);
-            $x1 = $x1 + $this->getMargin(Pdf::LEFT);
-            $x2 = $x2 + $this->getMargin(Pdf::LEFT);
+            $y1 = $this->getHeight() - $y1 - $this->getMargin(Table::TOP);
+            $y2 = $this->getHeight() - $y2 - $this->getMargin(Table::TOP);
+            $x1 = $x1 + $this->getMargin(Table::LEFT);
+            $x2 = $x2 + $this->getMargin(Table::LEFT);
         }
 
         return parent::drawLine($x1, $y1, $x2, $y2);
@@ -116,8 +120,8 @@ class Page extends Zend_Pdf_Page
     {
         //move origin
         if ($inContentArea) {
-            $y1 = $this->getHeight() - $y1 - $this->getMargin(Pdf::TOP);
-            $x1 = $x1 + $this->getMargin(Pdf::LEFT);
+            $y1 = $this->getHeight() - $y1 - $this->getMargin(Table::TOP);
+            $x1 = $x1 + $this->getMargin(Table::LEFT);
         }
 
         return parent::drawText($text, $x1, $y1, $charEncoding);
@@ -139,10 +143,10 @@ class Page extends Zend_Pdf_Page
     {
         //move origin
         if ($inContentArea) {
-            $y1 = $this->getHeight() - $y1 - $this->getMargin(Pdf::TOP);
-            $y2 = $this->getHeight() - $y2 - $this->getMargin(Pdf::TOP);
-            $x1 = $x1 + $this->getMargin(Pdf::LEFT);
-            $x2 = $x2 + $this->getMargin(Pdf::LEFT);
+            $y1 = $this->getHeight() - $y1 - $this->getMargin(Table::TOP);
+            $y2 = $this->getHeight() - $y2 - $this->getMargin(Table::TOP);
+            $x1 = $x1 + $this->getMargin(Table::LEFT);
+            $x2 = $x2 + $this->getMargin(Table::LEFT);
         }
 
         return parent::drawRectangle($x1, $y1, $x2, $y2, $filltype);
@@ -150,8 +154,8 @@ class Page extends Zend_Pdf_Page
 
     public function drawImage(\Zend_Pdf_Resource_Image $image, $x1, $y1, $width, $height, $inContentArea = true)
     {
-        $y1 = $this->getHeight() - $y1 - $this->getMargin(Pdf::TOP) - $height;
-        $x1 = $x1 + $this->getMargin(Pdf::LEFT);
+        $y1 = $this->getHeight() - $y1 - $this->getMargin(Table::TOP) - $height;
+        $x1 = $x1 + $this->getMargin(Table::LEFT);
 
         $y2 = $y1 + $height;
         $x2 = $x1 + $width;
