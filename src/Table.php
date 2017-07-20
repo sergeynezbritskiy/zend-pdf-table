@@ -22,35 +22,14 @@ class Table
 
     private $_width;
     private $_autoWidth = true;
-    private $_font;
-    private $_fontSize;
-    private $_headerFont;
-    private $_headerFontSize;
 
     /**
      * @var Row[]
      */
     private $_rows;
     private $_headerRow;
-    private $_numColumns;
     private $_pages;        //spanning pages or this table
     private $_repeatHeader = true;
-
-    /**
-     * Table constructor.
-     *
-     * @param int $numColumns
-     */
-    public function __construct($numColumns)
-    {
-        $this->_numColumns = $numColumns;
-
-        //set fonts
-        $this->_font = \Zend_Pdf_Font::FONT_COURIER;
-        $this->_fontSize = 10;
-        $this->_headerFont = \Zend_Pdf_Font::FONT_COURIER;
-        $this->_headerFontSize = 12;
-    }
 
     /**
      * Set Table Width
