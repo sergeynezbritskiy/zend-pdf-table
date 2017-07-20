@@ -2,11 +2,7 @@
 
 namespace sergeynezbritskiy\ZendPdfTable;
 
-use Zend_Pdf_Color_Html;
-use Zend_Pdf_Font;
 use Zend_Pdf_Page;
-use Zend_Pdf_Resource_Font;
-use Zend_Pdf_Style;
 
 class Page extends Zend_Pdf_Page
 {
@@ -15,18 +11,6 @@ class Page extends Zend_Pdf_Page
      * If page contains pagebreaks, pages are stored here
      */
     private $_pages = array();
-    private $_margin;
-    private $_defaultStyle;
-
-    /**
-     * Get Default Page Style
-     *
-     * @return Zend_Pdf_Style
-     */
-    public function getDefaultStyle()
-    {
-        return $this->_defaultStyle;
-    }
 
     /**
      * Get all pages for this page (page overflows)
@@ -42,6 +26,8 @@ class Page extends Zend_Pdf_Page
         }
     }
 
+    private $_margin;
+
     /**
      * Set page margins
      *
@@ -50,23 +36,6 @@ class Page extends Zend_Pdf_Page
     public function setMargins($margin = array())
     {
         $this->_margin = $margin;
-    }
-
-    /**
-     * Get Page Width
-     *
-     * @param bool $intContentArea
-     * @return int
-     */
-    public function getWidth($intContentArea = false)
-    {
-        $width = parent::getWidth();
-        if ($intContentArea) {
-            $width -= $this->_margin[Pdf::LEFT];
-            $width -= $this->_margin[Pdf::RIGHT];
-        }
-
-        return $width;
     }
 
     /**
@@ -91,58 +60,11 @@ class Page extends Zend_Pdf_Page
     }
 
     /**
-     * Set Page Font
-     *
-     * @param Zend_Pdf_Resource_Font $font
-     * @param int $fontSize
-     */
-    public function setFont(Zend_Pdf_Resource_Font $font, $fontSize = 10)
-    {
-        $this->_font = $font;
-        $this->_fontSize = $fontSize;
-        parent::setFont($font, $fontSize);
-    }
-
-    public function __construct($param1, $param2 = null, $param3 = null)
-    {
-        parent::__construct($param1, $param2, $param3);
-
-        $style = new Zend_Pdf_Style();
-        $style->setLineColor(new Zend_Pdf_Color_Html("#000000"));
-        $style->setFillColor(new Zend_Pdf_Color_Html("#000000"));
-        $style->setLineWidth(0.5);
-
-        $font = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_COURIER);
-        $style->setFont($font, 10);
-
-        $style->setLineDashingPattern(Zend_Pdf_Page::LINE_DASHING_SOLID);
-
-        $this->_defaultStyle = $style;
-        $this->setStyle($style);
-    }
-
-    /**
-     * Add a table to a page
-     *
-     * @param Table $table
-     * @param int $posX
-     * @param int $posY
-     */
-    public function addTable(Table $table, $posX, $posY, $inContentArea = true)
-    {
-        //render table --> check for new pages
-        $pages = $table->render($this, $posX, $posY, $inContentArea);
-        if (is_array($pages))
-            $this->_pages += $pages;
-    }
-
-    /**
      * Get text properties (width, height, [#lines using $max Width]), and warps lines
      *
      * @param string $text
-     * @param int $posX
-     * @param int $posY
      * @param int $maxWidth
+     * @return array
      */
     public function getTextProperties($text, $maxWidth = null)
     {
@@ -165,6 +87,7 @@ class Page extends Zend_Pdf_Page
      * @param int $x2
      * @param int $y2
      * @param bool $inContentArea
+     * @return \Zend_Pdf_Canvas_Interface
      */
     public function drawLine($x1, $y1, $x2, $y2, $inContentArea = true)
     {
@@ -176,7 +99,7 @@ class Page extends Zend_Pdf_Page
             $x2 = $x2 + $this->getMargin(Pdf::LEFT);
         }
 
-        parent::drawLine($x1, $y1, $x2, $y2);
+        return parent::drawLine($x1, $y1, $x2, $y2);
     }
 
     /**
@@ -187,6 +110,7 @@ class Page extends Zend_Pdf_Page
      * @param int $y1
      * @param string $charEncoding
      * @param bool $inContentArea
+     * @return \Zend_Pdf_Canvas_Interface
      */
     public function drawText($text, $x1, $y1, $charEncoding = "", $inContentArea = true)
     {
@@ -196,7 +120,7 @@ class Page extends Zend_Pdf_Page
             $x1 = $x1 + $this->getMargin(Pdf::LEFT);
         }
 
-        parent::drawText($text, $x1, $y1, $charEncoding);
+        return parent::drawText($text, $x1, $y1, $charEncoding);
     }
 
 
@@ -209,6 +133,7 @@ class Page extends Zend_Pdf_Page
      * @param int $y2
      * @param string $filltype
      * @param bool $inContentArea
+     * @return \Zend_Pdf_Canvas_Interface
      */
     public function drawRectangle($x1, $y1, $x2, $y2, $filltype = null, $inContentArea = true)
     {
@@ -220,18 +145,16 @@ class Page extends Zend_Pdf_Page
             $x2 = $x2 + $this->getMargin(Pdf::LEFT);
         }
 
-        parent::drawRectangle($x1, $y1, $x2, $y2, $filltype);
+        return parent::drawRectangle($x1, $y1, $x2, $y2, $filltype);
     }
 
     public function drawImage(\Zend_Pdf_Resource_Image $image, $x1, $y1, $width, $height, $inContentArea = true)
     {
-        if ($inContentArea) {
-            $y1 = $this->getHeight() - $y1 - $this->getMargin(Pdf::TOP) - $height;
-            $x1 = $x1 + $this->getMargin(Pdf::LEFT);
+        $y1 = $this->getHeight() - $y1 - $this->getMargin(Pdf::TOP) - $height;
+        $x1 = $x1 + $this->getMargin(Pdf::LEFT);
 
-            $y2 = $y1 + $height;
-            $x2 = $x1 + $width;
-        }
+        $y2 = $y1 + $height;
+        $x2 = $x1 + $width;
         parent::drawImage($image, $x1, $y1, $x2, $y2);
     }
 
@@ -299,18 +222,17 @@ class Page extends Zend_Pdf_Page
 
                 //new line
                 $x_inc = 0; //reset position
-                $curr_line = array(); //reset curr line
                 //add word
                 $curr_line = $word;
                 $x_inc += $width + $space_width;
             }
         }
 
+        $lines = [];
         //last line
         if (strlen(trim($curr_line, "\n")) > 0) {
             $lines [] = trim($curr_line);
         }
-
         return $lines;
     }
 
@@ -324,8 +246,6 @@ class Page extends Zend_Pdf_Page
     private function _textLines($text, $maxWidth = null)
     {
         $trimmed_lines = array();
-        $textWidth = 0;
-        $line_width = 0;
 
         $lines = explode("\n", $text);
         $max_line_width = 0;
@@ -358,39 +278,6 @@ class Page extends Zend_Pdf_Page
         return array('lines' => $trimmed_lines, 'text_width' => $textWidth, 'max_width' => $maxWidth);
     }
 
-
-//	
-//	private function getWordWidth($word) {
-//		$font = $this->getFont ();
-//		$font_size = $this->getFontSize ();
-//		$em = $font->getUnitsPerEm ();
-//		
-//		$glyphs = array ();
-//		//get glyph for each character
-//		
-//		foreach ( range ( 0, strlen ( $word ) - 1 ) as $i ) {
-//			$glyphs [] = @ord ( $word [$i] );
-//		}
-//		
-//		$width = array_sum ( $font->widthsForGlyphs ( $glyphs ) ) / $em * $font_size;
-//		return $width;
-//	}
-//	
-//	
-//	
-//	public function getFontHeightInPixel() {
-//		$font = $this->getFont ();
-//		$lineheight = ($font->getLineHeight ()) / $font->getUnitsPerEm () * $this->getFontSize ();
-//		return $lineheight;
-//	}
-//	
-//	public function getFontLineGapInPixel() {
-//		$font = $this->getFont ();
-//		$linegap = ($font->getLineGap ()) / $font->getUnitsPerEm () * $this->getFontSize ();
-//		return $linegap;
-//	}
-//	
-//	}
 }
 
 ?>

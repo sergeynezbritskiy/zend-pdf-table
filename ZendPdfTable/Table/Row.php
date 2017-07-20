@@ -13,6 +13,9 @@ class Row
 
     protected $_font;
     protected $_fontSize = 10;
+    /**
+     * @var Column[]
+     */
     protected $_cols;
     protected $_autoHeight = true;
     protected $_width;
@@ -44,7 +47,7 @@ class Row
     /**
      * Add Cell Padding
      *
-     * @param Pdf $position
+     * @param int $position
      * @param int $value
      */
     public function setCellPadding($position, $value)
@@ -137,7 +140,7 @@ class Row
     /**
      * Remove Row Border
      *
-     * @param Pdf $position
+     * @param int $position
      */
     public function removeBorder($position)
     {
@@ -182,7 +185,7 @@ class Row
      * Insert a new column between existing columns
      *
      * @param Column $col
-     * @param int index of new Coumn $index
+     * @param int $index of new Coumn $index
      */
     public function insertColumn(Column $col, $index)
     {
@@ -216,10 +219,12 @@ class Row
      * @param Page $page
      * @param int $posX
      * @param int $posY
-     * @param int $inContentArea
+     * @param bool $inContentArea
      */
     public function preRender(Page $page, $posX, $posY, $inContentArea = true)
     {
+        $uniform_width = $free_width = $force_line_breaking = $width = 0;
+
         //pre-render each cell in row and get height
         $max_height = 0;
 
@@ -368,7 +373,7 @@ class Row
     /**
      * Returns the width of a specific border
      *
-     * @param float $position
+     * @param int $position
      * @return int width
      */
     public function getBorderLineWidth($position)

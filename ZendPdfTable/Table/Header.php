@@ -2,14 +2,13 @@
 
 namespace sergeynezbritskiy\ZendPdfTable\Table;
 
-use sergeynezbritskiy\ZendPdfTable\Table\Row;
 use sergeynezbritskiy\ZendPdf\Table\Column;
 use sergeynezbritskiy\ZendPdfTable\Pdf;
 use sergeynezbritskiy\ZendPdfTable\Page;
 use Zend_Pdf_Font;
 use Zend_Pdf_Style;
 
-class Header extends Row
+class Header extends \sergeynezbritskiy\ZendPdfTable\Table\Row
 {
 
     private $_align;
@@ -28,6 +27,7 @@ class Header extends Row
     public function __construct($labels = array())
     {
 
+        parent::__construct();
         $cols = null;
         foreach ($labels as $label) {
             $col = new Column();

@@ -2,6 +2,11 @@
 
 namespace sergeynezbritskiy\ZendPdfTable;
 
+/**
+ * Class Table
+ *
+ * @package sergeynezbritskiy\ZendPdfTable
+ */
 class Table
 {
     private $_width;

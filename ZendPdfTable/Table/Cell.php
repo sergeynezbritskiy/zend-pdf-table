@@ -114,7 +114,7 @@ class Cell
     /**
      * Set Cell Padding
      *
-     * @param Pdf $position
+     * @param int $position
      * @param int $value padding
      */
     public function setPadding($position, $value)
@@ -125,7 +125,7 @@ class Cell
     /**
      * Get Cell Padding
      *
-     * @param Pdf $position
+     * @param int $position
      * @return int
      */
     public function getPadding($position)
@@ -140,7 +140,7 @@ class Cell
     /**
      * Set Horizontal Alignment
      *
-     * @param Pdf $align
+     * @param int $align
      */
     public function setAlignment($align)
     {
@@ -175,7 +175,7 @@ class Cell
     /**
      * Get Cell Border
      *
-     * @param Pdf $position
+     * @param int $position
      * @return Zend_Pdf_Style $style
      */
     public function getBorder($position)
@@ -211,7 +211,7 @@ class Cell
     /**
      * Remove Cell Border
      *
-     * @param Pdf $position
+     * @param int $position
      */
     public function removeBorder($position)
     {
@@ -327,7 +327,8 @@ class Cell
      * @param string $filename full path
      * @param Pdf $align Horizontal Alignment
      * @param Pdf $valign Vertical Alignment
-     * @param float $scale between (0,1]
+     * @param float|int $scale between (0,1]
+     * @throws \Zend_Exception
      */
     public function setImage($filename, $align = null, $valign = null, $scale = 1)
     {
@@ -348,8 +349,11 @@ class Cell
      * @param int $posX
      * @param int $posY
      * @param bool $inContentArea
+     * @throws \Zend_Exception
+     * @throws \Zend_Pdf_Exception
      */
-    public function preRender(Page $page, $posX, $posY, $inContentArea = true)
+    public function preRender(Page $page, $posX, /** @noinspection PhpUnusedParameterInspection */
+                              $posY, $inContentArea = true)
     {
         if (!$this->_width) {
             //no width given, get max width of page
@@ -374,7 +378,7 @@ class Cell
             $text_props = $page->getTextProperties($this->_text['text'], $maxWidth);
 
             //reset style
-            $page->setStyle($page->getDefaultStyle());
+            $page->setStyle($this->getDefaultStyle());
 
             //set width
             if (!$this->_width) {
@@ -478,7 +482,7 @@ class Cell
             $page->drawText($this->_text['text'], $this->_getTextPosX($posX), $this->_getTextPosY($page, $posY));
         }
         //reset style
-        $page->setStyle($page->getDefaultStyle());
+        $page->setStyle($this->getDefaultStyle());
     }
 
     private function _renderImage(Page $page, $posX, $posY)
@@ -527,7 +531,7 @@ class Cell
                     break;
             }
             //reset page style
-            $page->setStyle($page->getDefaultStyle());
+            $page->setStyle($this->getDefaultStyle());
         }
     }
 
@@ -541,7 +545,7 @@ class Cell
             $posY + $this->_height,
             Zend_Pdf_Page::SHAPE_DRAW_FILL);
         //reset style
-        $page->setStyle($page->getDefaultStyle());
+        $page->setStyle($this->getDefaultStyle());
     }
 
     /**
@@ -553,7 +557,6 @@ class Cell
      */
     private function _getTextPosX($posX)
     {
-        $x = 0;
         switch ($this->_align) {
             case Pdf::RIGHT:
                 $x = $posX + $this->_width - $this->_text['width'] - $this->_padding[Pdf::RIGHT] - $this->_getBorderLineWidth(Pdf::RIGHT) / 2;
@@ -578,7 +581,6 @@ class Cell
      */
     private function _getTextPosY(Page $page, $posY)
     {
-        $y = 0;
         $line_height = $page->getFontHeight() + $this->_textLineSpacing;
 
         switch ($this->_vAlign) {
@@ -598,7 +600,6 @@ class Cell
 
     private function _getImagePosX($posX)
     {
-        $x = 0;
         switch ($this->_align) {
             case Pdf::RIGHT:
                 $x = $posX + $this->_width - $this->_image['width'] - $this->_padding[Pdf::RIGHT];
@@ -615,7 +616,6 @@ class Cell
 
     private function _getImagePosY($posY)
     {
-        $y = 0;
         switch ($this->_vAlign) {
             case Pdf::BOTTOM:
                 $y = $posY + $this->_height - $this->_image['height'] - $this->_padding[Pdf::BOTTOM];
@@ -639,6 +639,21 @@ class Cell
             $width = 0;
         }
         return $width;
+    }
+
+    private function getDefaultStyle()
+    {
+        $style = new Zend_Pdf_Style();
+        $style->setLineColor(new \Zend_Pdf_Color_Html("#000000"));
+        $style->setFillColor(new \Zend_Pdf_Color_Html("#000000"));
+        $style->setLineWidth(0.5);
+
+        $font = \Zend_Pdf_Font::fontWithName(\Zend_Pdf_Font::FONT_COURIER);
+        $style->setFont($font, 10);
+
+        /** @noinspection PhpParamsInspection */
+        $style->setLineDashingPattern(Zend_Pdf_Page::LINE_DASHING_SOLID);
+        return $style;
     }
 
 }
