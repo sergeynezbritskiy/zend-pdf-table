@@ -2,21 +2,21 @@
 
 namespace sergeynezbritskiy\ZendPdfTable\Table;
 
+use sergeynezbritskiy\ZendPdfTable\AbstractElement;
 use sergeynezbritskiy\ZendPdfTable\Table;
 use Zend_Pdf_Font;
 use Zend_Pdf_Resource_Font;
-use Zend_Pdf_Style;
 
 /**
  * Class Row
  *
  * @package sergeynezbritskiy\ZendPdfTable\Table
  */
-class Row
+class Row extends AbstractElement
 {
 
-    protected $_font;
-    protected $_fontSize = 10;
+    protected $fontStyle;
+    protected $fontSize = 10;
 
     /**
      * @var Column[]
@@ -25,9 +25,6 @@ class Row
     protected $_autoHeight = true;
     protected $_width;
     protected $_height;
-    protected $_border = array();
-    protected $_padding = array();
-    protected $_cellPadding = array(0, 0, 0, 0);
 
     private $_hasPageBreak;
     private $_forceUniformColumnWidth = false;
@@ -45,28 +42,7 @@ class Row
     public function __construct()
     {
         //set default font
-        $this->_font = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_COURIER);
-    }
-
-    /**
-     * Add Cell Padding
-     *
-     * @param array [top,right,bottom,left] $values
-     */
-    public function setCellPaddings(array $values)
-    {
-        $this->_cellPadding = $values;
-    }
-
-    /**
-     * Add Cell Padding
-     *
-     * @param int $position
-     * @param int $value
-     */
-    public function setCellPadding($position, $value)
-    {
-        $this->_cellPadding[$position] = $value;
+        $this->fontStyle = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_COURIER);
     }
 
     /**
@@ -141,36 +117,13 @@ class Row
     }
 
     /**
-     * Set row border properties, default properties for all cells in this row
-     *
-     * @param int $position
-     * @param Zend_Pdf_Style $style
-     */
-    public function setBorder($position, Zend_Pdf_Style $style)
-    {
-        $this->_border[$position] = $style;
-    }
-
-    /**
      * Remove Row Border
      *
      * @param int $position
      */
     public function removeBorder($position)
     {
-        unset($this->_border[$position]);
-    }
-
-    /**
-     * Set Row Font, default value for all Columns in this Row
-     *
-     * @param Zend_Pdf_Resource_Font $font
-     * @param int $fontSize
-     */
-    public function setFont(Zend_Pdf_Resource_Font $font, $fontSize = 10)
-    {
-        $this->_font = $font;
-        $this->_fontSize = $fontSize;
+        unset($this->borderStyles[$position]);
     }
 
     /**
@@ -259,7 +212,7 @@ class Row
             foreach ($this->_cols as $col) {
                 //set font if no font set
                 if (!$col->getFont())
-                    $col->setFont($this->_font, $this->_fontSize);
+                    $col->setFont($this->fontStyle, $this->fontSize);
                 $w = $col->getWidth();
                 if ($w) {
                     //column with specified width
@@ -315,9 +268,9 @@ class Row
                 $col->setWidth($width);
             }
             if (!$col->getFont())
-                $col->setFont($this->_font, $this->_fontSize);
+                $col->setFont($this->fontStyle, $this->fontSize);
 
-            foreach ($this->_cellPadding as $pos => $val) {
+            foreach ($this->cellPaddings as $pos => $val) {
                 if (!$col->getPadding($pos))
                     $col->setPadding($pos, $val);
             }
@@ -367,7 +320,7 @@ class Row
             $col->setHeight($this->_height);
 
             //set default borders if not set
-            foreach ($this->_border as $pos => $style) {
+            foreach ($this->borderStyles as $pos => $style) {
                 if (!$col->getBorder($pos))
                     $col->setBorder($pos, $style);
             }
@@ -386,8 +339,8 @@ class Row
      */
     public function getBorderLineWidth($position)
     {
-        if (isset($this->_border[$position])) {
-            $style = $this->_border[$position];
+        if (isset($this->borderStyles[$position])) {
+            $style = $this->borderStyles[$position];
             $width = $style->getLineWidth();
         } else {
             $width = 0;

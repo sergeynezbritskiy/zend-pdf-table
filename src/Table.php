@@ -10,15 +10,8 @@ use sergeynezbritskiy\ZendPdfTable\Table\Row;
  *
  * @package sergeynezbritskiy\ZendPdfTable
  */
-class Table
+class Table extends AbstractElement
 {
-
-    const TOP = 0;
-    const RIGHT = 1;
-    const BOTTOM = 2;
-    const LEFT = 3;
-    const CENTER = 4;
-    const MIDDLE = 5;
 
     private $_width;
     private $_autoWidth = true;
@@ -238,6 +231,17 @@ class Table
                 $col->setWidth($max_col_width[$idx]);
             }
         }
+    }
+
+    /**
+     * @return Row
+     */
+    public function createRow()
+    {
+        $row = new Row();
+        //inherit styles from table
+        $row->setStyles($this->getStyles());
+        return $row;
     }
 
 }

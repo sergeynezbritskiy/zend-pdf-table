@@ -57,13 +57,13 @@ class Header extends \sergeynezbritskiy\ZendPdfTable\Table\Row
         //set default borders
         $style = new Zend_Pdf_Style();
         $style->setLineWidth(1);
-        $this->setBorder(Table::BOTTOM, $style);
+        $this->setBorderStyle(Table::BOTTOM, $style);
         $this->setCellPaddings(array(2, 1, 2, 1));
         $this->setAlignment(Table::LEFT);
 
         //set default font
-        $this->_font = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA_BOLD);
-        $this->_fontSize = 7;
+        $this->fontStyle = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA_BOLD);
+        $this->fontSize = 7;
     }
 
     /**
@@ -78,9 +78,9 @@ class Header extends \sergeynezbritskiy\ZendPdfTable\Table\Row
         foreach ($this->_cols AS $col) {
             //set default font
             if (!$col->getFont())
-                $col->setFont($this->_font, $this->_fontSize);
+                $col->setFont($this->fontStyle, $this->fontSize);
             //set default borders if not set
-            foreach ($this->_border as $pos => $style) {
+            foreach ($this->borderStyles as $pos => $style) {
                 if (!$col->getBorder($pos))
                     $col->setBorder($pos, $style);
             }
