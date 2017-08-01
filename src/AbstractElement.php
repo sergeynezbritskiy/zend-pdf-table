@@ -50,7 +50,7 @@ abstract class AbstractElement
     /**
      * @var int[]
      */
-    protected $cellPaddings = [0, 0, 0, 0];
+    protected $paddings = [0, 0, 0, 0];
 
     /**
      * Options array example
@@ -116,22 +116,25 @@ abstract class AbstractElement
             $this->setBorderStyle(self::LEFT, $options['border_left']);
         }
         if (isset($options['paddings'])) {
-            $this->setCellPaddings($options['paddings']);
+            $this->setPaddings($options['paddings']);
         }
         if (isset($options['padding_top'])) {
-            $this->setCellPadding(self::TOP, $options['padding_top']);
+            $this->setPadding(self::TOP, $options['padding_top']);
         }
         if (isset($options['padding_right'])) {
-            $this->setCellPadding(self::RIGHT, $options['padding_right']);
+            $this->setPadding(self::RIGHT, $options['padding_right']);
         }
         if (isset($options['padding_bottom'])) {
-            $this->setCellPadding(self::BOTTOM, $options['padding_bottom']);
+            $this->setPadding(self::BOTTOM, $options['padding_bottom']);
         }
         if (isset($options['padding_left'])) {
-            $this->setCellPadding(self::LEFT, $options['padding_left']);
+            $this->setPadding(self::LEFT, $options['padding_left']);
         }
     }
 
+    /**
+     * @return array
+     */
     public function getStyles()
     {
         $result = [];
@@ -148,7 +151,7 @@ abstract class AbstractElement
             $result['font_size'] = $this->getFontSize();
         }
         $result['borders'] = $this->getBorderStyles();
-        $result['paddings'] = $this->getCellPaddings();
+        $result['paddings'] = $this->getPaddings();
         return $result;
     }
 
@@ -257,35 +260,35 @@ abstract class AbstractElement
     /**
      * @return int[]
      */
-    public function getCellPaddings()
+    public function getPaddings()
     {
-        return $this->cellPaddings;
+        return $this->paddings;
     }
 
     /**
-     * @param int[] $cellPaddings
+     * @param int[] $paddings
      */
-    public function setCellPaddings($cellPaddings)
+    public function setPaddings($paddings)
     {
-        $this->cellPaddings = $cellPaddings;
+        $this->paddings = $paddings;
     }
 
     /**
      * @param int $position
      * @return int
      */
-    public function getCellPadding($position)
+    public function getPadding($position)
     {
-        return isset($this->cellPaddings[$position]) ? $this->cellPaddings[$position] : 0;
+        return isset($this->paddings[$position]) ? $this->paddings[$position] : 0;
     }
 
     /**
      * @param int $position
      * @param int $cellPadding
      */
-    public function setCellPadding($position, $cellPadding)
+    public function setPadding($position, $cellPadding)
     {
-        $this->cellPaddings[$position] = $cellPadding;
+        $this->paddings[$position] = $cellPadding;
     }
 
     /**

@@ -5,7 +5,6 @@ namespace sergeynezbritskiy\ZendPdfTable\Table;
 use sergeynezbritskiy\ZendPdfTable\AbstractElement;
 use sergeynezbritskiy\ZendPdfTable\Table;
 use Zend_Pdf_Font;
-use Zend_Pdf_Resource_Font;
 
 /**
  * Class Row
@@ -14,9 +13,6 @@ use Zend_Pdf_Resource_Font;
  */
 class Row extends AbstractElement
 {
-
-    protected $fontStyle;
-    protected $fontSize = 10;
 
     /**
      * @var Column[]
@@ -211,8 +207,10 @@ class Row extends AbstractElement
             $dynamic_row_width = 0;
             foreach ($this->_cols as $col) {
                 //set font if no font set
-                if (!$col->getFont())
-                    $col->setFont($this->fontStyle, $this->fontSize);
+                if (!$col->getFontStyle())
+                    $col->setFontStyle($this->getFontStyle());
+                if (!$col->getFontSize())
+                    $col->setFontSize($this->getFontSize());
                 $w = $col->getWidth();
                 if ($w) {
                     //column with specified width
@@ -267,10 +265,12 @@ class Row extends AbstractElement
                 }
                 $col->setWidth($width);
             }
-            if (!$col->getFont())
-                $col->setFont($this->fontStyle, $this->fontSize);
+            if (!$col->getFontStyle())
+                $col->setFontStyle($this->getFontStyle());
+            if (!$col->getFontSize())
+                $col->setFontSize($this->getFontSize());
 
-            foreach ($this->cellPaddings as $pos => $val) {
+            foreach ($this->paddings as $pos => $val) {
                 if (!$col->getPadding($pos))
                     $col->setPadding($pos, $val);
             }
@@ -321,8 +321,8 @@ class Row extends AbstractElement
 
             //set default borders if not set
             foreach ($this->borderStyles as $pos => $style) {
-                if (!$col->getBorder($pos))
-                    $col->setBorder($pos, $style);
+                if (!$col->getBorderStyle($pos))
+                    $col->setBorderStyle($pos, $style);
             }
 
             $col->render($page, $x, $posY);

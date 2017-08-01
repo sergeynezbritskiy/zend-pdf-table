@@ -2,12 +2,12 @@
 
 namespace sergeynezbritskiy\ZendPdfTable\Table;
 
+use sergeynezbritskiy\ZendPdfTable\AbstractElement;
 use sergeynezbritskiy\ZendPdfTable\Table;
 use Zend_Exception;
 use Zend_Pdf_Color;
 use Zend_Pdf_Image;
 use Zend_Pdf_Page;
-use Zend_Pdf_Resource_Font;
 use Zend_Pdf_Style;
 
 /**
@@ -15,7 +15,7 @@ use Zend_Pdf_Style;
  *
  * @package sergeynezbritskiy\ZendPdfTable\Table
  */
-class Cell
+class Cell extends AbstractElement
 {
 
     private $_width;
@@ -24,32 +24,12 @@ class Cell
     private $_recommendedHeight;
     private $_text;
 
-    /**
-     * @var Zend_Pdf_Resource_Font
-     */
-    private $_font;
-    private $_fontSize = 10;
     private $_hAlign;
     private $_vAlign;
     private $_bgColor;
-    private $_color;
     private $_textLineSpacing = 0;
 
     private $_image;
-
-    /**
-     * Cell padding
-     *
-     * @var array (padding-top,padding-right,padding-bottom,padding-left)
-     */
-    private $_padding;
-
-    /**
-     * Cell borders
-     *
-     * @var array (sergeynezbritskiy\ZendPdfTable\My_Pdf position=>array('color','width','dashing_pattern'))
-     */
-    private $_border;
 
     /**
      * Set Text Line Height
@@ -116,42 +96,6 @@ class Cell
     }
 
     /**
-     * Set Cell Text Color
-     *
-     * @param Zend_Pdf_Color $color
-     */
-    public function setColor(Zend_Pdf_Color $color)
-    {
-        $this->_color = $color;
-    }
-
-    /**
-     * Set Cell Padding
-     *
-     * @param int $position
-     * @param int $value padding
-     */
-    public function setPadding($position, $value)
-    {
-        $this->_padding[$position] = $value;
-    }
-
-    /**
-     * Get Cell Padding
-     *
-     * @param int $position
-     * @return int
-     */
-    public function getPadding($position)
-    {
-        if (isset($this->_padding[$position])) {
-            return $this->_padding[$position];
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * Set Horizontal Alignment
      *
      * @param int $align
@@ -189,41 +133,6 @@ class Cell
         return $this->_vAlign;
     }
 
-    /**
-     * Get Cell Border
-     *
-     * @param int $position
-     * @return Zend_Pdf_Style $style
-     */
-    public function getBorder($position)
-    {
-        if (isset($this->_border[$position])) {
-            return $this->_border[$position];
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Set cell border properties
-     *
-     * @param int $position
-     * @param Zend_Pdf_Style $style
-     */
-    public function setBorder($position, Zend_Pdf_Style $style)
-    {
-        $this->_border[$position] = $style;
-    }
-
-    /**
-     * Set Cell Borders
-     *
-     * @param array (array(sergeynezbritskiy\ZendPdfTable\My_Pdf position, Zend_Pdf_Styles style))
-     */
-    public function setBorders($borders)
-    {
-        $this->_border = $borders;
-    }
 
     /**
      * Remove Cell Border
@@ -232,29 +141,7 @@ class Cell
      */
     public function removeBorder($position)
     {
-        unset($this->_border[$position]);
-    }
-
-    /**
-     * Set Font and Size
-     *
-     * @param Zend_Pdf_Resource_Font $font
-     * @param int $fontSize
-     */
-    public function setFont(Zend_Pdf_Resource_Font $font, $fontSize = 10)
-    {
-        $this->_font = $font;
-        $this->_fontSize = $fontSize;
-    }
-
-    /**
-     * Get Cell Font
-     *
-     * @return Zend_Pdf_Resource_Font
-     */
-    public function getFont()
-    {
-        return $this->_font;
+        unset($this->borderStyles[$position]);
     }
 
     /**
@@ -384,12 +271,12 @@ class Cell
         }
 
         //calc max cell width
-        $maxWidth = $width - ($this->_padding[Table::LEFT] + $this->_padding[Table::RIGHT]) - (+$this->_getBorderLineWidth(Table::LEFT) + $this->_getBorderLineWidth(Table::RIGHT));
+        $maxWidth = $width - ($this->paddings[Table::LEFT] + $this->paddings[Table::RIGHT]) - (+$this->_getBorderLineWidth(Table::LEFT) + $this->_getBorderLineWidth(Table::RIGHT));
 
         if ($this->_text) {
 
             //set font
-            $page->setFont($this->_font, $this->_fontSize);
+            $page->setFont($this->fontStyle, $this->fontSize);
 
             //get height,width,lines
             $text_props = $this->getTextProperties($page, $this->_text['text'], $maxWidth);
@@ -400,7 +287,7 @@ class Cell
             //set width
             if (!$this->_width) {
                 //add padding
-                $this->_recommendedWidth = $text_props['text_width'] + ($this->_padding[Table::LEFT] + $this->_padding[Table::RIGHT]) + $this->_getBorderLineWidth(Table::LEFT) + $this->_getBorderLineWidth(Table::RIGHT);
+                $this->_recommendedWidth = $text_props['text_width'] + ($this->paddings[Table::LEFT] + $this->paddings[Table::RIGHT]) + $this->_getBorderLineWidth(Table::LEFT) + $this->_getBorderLineWidth(Table::RIGHT);
             } else {
                 $this->_recommendedWidth = $text_props['max_width'];
             }
@@ -412,7 +299,7 @@ class Cell
                 } else {
                     $height = $text_props['height'];
                 }
-                $this->_recommendedHeight = $height + ($this->_padding[Table::TOP] + $this->_padding[Table::BOTTOM]);
+                $this->_recommendedHeight = $height + ($this->paddings[Table::TOP] + $this->paddings[Table::BOTTOM]);
             }
 
             //store text props;
@@ -425,9 +312,9 @@ class Cell
             $image = Zend_Pdf_Image::imageWithPath($this->_image['filename']);
 
             if (!$this->_width)
-                $this->_recommendedWidth = $this->_image['scale'] * $image->getPixelWidth() + ($this->_padding[Table::LEFT] + $this->_padding[Table::RIGHT]) + $this->_getBorderLineWidth(Table::LEFT) + $this->_getBorderLineWidth(Table::RIGHT);
+                $this->_recommendedWidth = $this->_image['scale'] * $image->getPixelWidth() + ($this->paddings[Table::LEFT] + $this->paddings[Table::RIGHT]) + $this->_getBorderLineWidth(Table::LEFT) + $this->_getBorderLineWidth(Table::RIGHT);
             if (!$this->_height)
-                $this->_recommendedHeight = $this->_image['scale'] * $image->getPixelHeight() + ($this->_padding[Table::TOP] + $this->_padding[Table::BOTTOM]);
+                $this->_recommendedHeight = $this->_image['scale'] * $image->getPixelHeight() + ($this->paddings[Table::TOP] + $this->paddings[Table::BOTTOM]);
 
             $this->_image['image'] = $image;
             $this->_image['width'] = $this->_image['scale'] * $image->getPixelWidth();
@@ -484,14 +371,14 @@ class Cell
     {
 
         $glyphs = array();
-        $em = $this->_font->getUnitsPerEm();
+        $em = $this->fontStyle->getUnitsPerEm();
 
         //get glyph for each character
         foreach (range(0, strlen($text) - 1) as $i) {
             $glyphs [] = @ord($text [$i]);
         }
 
-        $width = array_sum($this->_font->widthsForGlyphs($glyphs)) / $em * $this->_fontSize;
+        $width = array_sum($this->fontStyle->widthsForGlyphs($glyphs)) / $em * $this->fontSize;
 
         return $width;
     }
@@ -602,10 +489,10 @@ class Cell
     {
         if (!$this->_text) return;
 
-        $page->setFont($this->_font, $this->_fontSize);
+        $page->setFont($this->fontStyle, $this->fontSize);
 
-        if ($this->_color)
-            $page->setFillColor($this->_color);
+        if ($this->fillColor)
+            $page->setFillColor($this->fillColor);
 
         if (count($this->_text['lines']) > 1) {
 
@@ -687,9 +574,9 @@ class Cell
 
     private function _renderBorder(\Zend_Pdf_Page $page, $posX, $posY)
     {
-        if (!$this->_border) return;
+        if (!$this->borderStyles) return;
 
-        foreach ($this->_border as $key => $style) {
+        foreach ($this->borderStyles as $key => $style) {
             $page->setStyle($style);
             switch ($key) {
                 case Table::TOP:
@@ -795,13 +682,13 @@ class Cell
     {
         switch ($this->_hAlign) {
             case Table::RIGHT:
-                $x = $posX + $this->_width - $this->_text['width'] - $this->_padding[Table::RIGHT] - $this->_getBorderLineWidth(Table::RIGHT) / 2;
+                $x = $posX + $this->_width - $this->_text['width'] - $this->paddings[Table::RIGHT] - $this->_getBorderLineWidth(Table::RIGHT) / 2;
                 break;
             case Table::CENTER:
                 $x = $posX + $this->_width / 2 - $this->_text['width'] / 2;
                 break;
             default: //LEFT
-                $x = $posX + $this->_padding[Table::LEFT] + $this->_getBorderLineWidth(Table::LEFT) / 2;
+                $x = $posX + $this->paddings[Table::LEFT] + $this->_getBorderLineWidth(Table::LEFT) / 2;
                 break;
         }
         return $x;
@@ -821,13 +708,13 @@ class Cell
 
         switch ($this->_vAlign) {
             case Table::BOTTOM:
-                $y = $posY + $this->_height - $this->_padding[Table::BOTTOM];
+                $y = $posY + $this->_height - $this->paddings[Table::BOTTOM];
                 break;
             case Table::MIDDLE:
                 $y = $posY + $this->_height / 2 + $line_height / 2;
                 break;
             default: //TOP
-                $y = $posY + $line_height + $this->_padding[Table::TOP];
+                $y = $posY + $line_height + $this->paddings[Table::TOP];
                 break;
         }
         return $y;
@@ -841,13 +728,13 @@ class Cell
     {
         switch ($this->_hAlign) {
             case Table::RIGHT:
-                $x = $posX + $this->_width - $this->_image['width'] - $this->_padding[Table::RIGHT];
+                $x = $posX + $this->_width - $this->_image['width'] - $this->paddings[Table::RIGHT];
                 break;
             case Table::CENTER:
                 $x = $posX + $this->_width / 2 - $this->_image['width'] / 2;
                 break;
             default: //LEFT
-                $x = $posX + $this->_padding[Table::LEFT];
+                $x = $posX + $this->paddings[Table::LEFT];
                 break;
         }
         return $x;
@@ -861,13 +748,13 @@ class Cell
     {
         switch ($this->_vAlign) {
             case Table::BOTTOM:
-                $y = $posY + $this->_height - $this->_image['height'] - $this->_padding[Table::BOTTOM];
+                $y = $posY + $this->_height - $this->_image['height'] - $this->paddings[Table::BOTTOM];
                 break;
             case Table::MIDDLE:
                 $y = $posY + ($this->_height - $this->_image['height']) / 2;
                 break;
             default: //TOP
-                $y = $posY + $this->_padding[Table::TOP];
+                $y = $posY + $this->paddings[Table::TOP];
                 break;
         }
         return $y;
@@ -879,8 +766,8 @@ class Cell
      */
     private function _getBorderLineWidth($position)
     {
-        if (isset($this->_border[$position])) {
-            $style = $this->_border[$position];
+        if (isset($this->borderStyles[$position])) {
+            $style = $this->borderStyles[$position];
             $width = $style->getLineWidth();
         } else {
             $width = 0;

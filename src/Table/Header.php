@@ -11,7 +11,7 @@ use Zend_Pdf_Style;
  *
  * @package sergeynezbritskiy\ZendPdfTable\Table
  */
-class Header extends \sergeynezbritskiy\ZendPdfTable\Table\Row
+class Header extends Row
 {
 
     private $_hAlign;
@@ -58,7 +58,7 @@ class Header extends \sergeynezbritskiy\ZendPdfTable\Table\Row
         $style = new Zend_Pdf_Style();
         $style->setLineWidth(1);
         $this->setBorderStyle(Table::BOTTOM, $style);
-        $this->setCellPaddings(array(2, 1, 2, 1));
+        $this->setPaddings(array(2, 1, 2, 1));
         $this->setAlignment(Table::LEFT);
 
         //set default font
@@ -77,12 +77,14 @@ class Header extends \sergeynezbritskiy\ZendPdfTable\Table\Row
 
         foreach ($this->_cols AS $col) {
             //set default font
-            if (!$col->getFont())
-                $col->setFont($this->fontStyle, $this->fontSize);
+            if (!$col->getFontStyle())
+                $col->setFontStyle($this->getFontStyle());
+            if (!$col->getFontSize())
+                $col->setFontSize($this->getFontSize());
             //set default borders if not set
             foreach ($this->borderStyles as $pos => $style) {
-                if (!$col->getBorder($pos))
-                    $col->setBorder($pos, $style);
+                if (!$col->getBorderStyle($pos))
+                    $col->setBorderStyle($pos, $style);
             }
 
             if (!$col->getAlignment())
