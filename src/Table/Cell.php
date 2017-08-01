@@ -18,7 +18,8 @@ use Zend_Pdf_Style;
 class Cell extends AbstractElement
 {
 
-    private $_width;
+    protected $width;
+
     private $_height;
     private $_recommendedWidth;
     private $_recommendedHeight;
@@ -151,7 +152,7 @@ class Cell extends AbstractElement
      */
     public function setWidth($value)
     {
-        $this->_width = $value;
+        $this->width = $value;
     }
 
     /**
@@ -161,7 +162,7 @@ class Cell extends AbstractElement
      */
     public function getWidth()
     {
-        return $this->_width;
+        return $this->width;
     }
 
     /**
@@ -259,7 +260,7 @@ class Cell extends AbstractElement
     public function preRender(\Zend_Pdf_Page $page, $posX, /** @noinspection PhpUnusedParameterInspection */
                               $posY, $inContentArea = true)
     {
-        if (!$this->_width) {
+        if (!$this->width) {
             //no width given, get max width of page
             if ($inContentArea) {
                 $width = $page->getWidth() - $posX - ($page->getMargin(Table::LEFT) + $page->getMargin(Table::RIGHT));
@@ -267,7 +268,7 @@ class Cell extends AbstractElement
                 $width = $page->getWidth() - $posX;
             }
         } else {
-            $width = $this->_width;
+            $width = $this->width;
         }
 
         //calc max cell width
@@ -285,7 +286,7 @@ class Cell extends AbstractElement
             $page->setStyle($this->getDefaultStyle());
 
             //set width
-            if (!$this->_width) {
+            if (!$this->width) {
                 //add padding
                 $this->_recommendedWidth = $text_props['text_width'] + ($this->paddings[Table::LEFT] + $this->paddings[Table::RIGHT]) + $this->_getBorderLineWidth(Table::LEFT) + $this->_getBorderLineWidth(Table::RIGHT);
             } else {
@@ -311,7 +312,7 @@ class Cell extends AbstractElement
 
             $image = Zend_Pdf_Image::imageWithPath($this->_image['filename']);
 
-            if (!$this->_width)
+            if (!$this->width)
                 $this->_recommendedWidth = $this->_image['scale'] * $image->getPixelWidth() + ($this->paddings[Table::LEFT] + $this->paddings[Table::RIGHT]) + $this->_getBorderLineWidth(Table::LEFT) + $this->_getBorderLineWidth(Table::RIGHT);
             if (!$this->_height)
                 $this->_recommendedHeight = $this->_image['scale'] * $image->getPixelHeight() + ($this->paddings[Table::TOP] + $this->paddings[Table::BOTTOM]);
@@ -582,20 +583,20 @@ class Cell extends AbstractElement
                 case Table::TOP:
                     $this->drawLine($page,
                         $posX, $posY - $this->_getBorderLineWidth(Table::TOP) / 2,
-                        $posX + $this->_width, $posY - $this->_getBorderLineWidth(Table::TOP) / 2
+                        $posX + $this->width, $posY - $this->_getBorderLineWidth(Table::TOP) / 2
                     );
                     break;
                 case Table::BOTTOM:
                     $this->drawLine($page,
                         $posX, $posY + $this->_height + $this->_getBorderLineWidth(Table::BOTTOM) / 2,
-                        $posX + $this->_width, $posY + $this->_height + $this->_getBorderLineWidth(Table::BOTTOM) / 2
+                        $posX + $this->width, $posY + $this->_height + $this->_getBorderLineWidth(Table::BOTTOM) / 2
                     );
                     break;
                 case Table::RIGHT:
                     //@@TODO INCLUDE BORDER LINE WIDTH??
                     $this->drawLine($page,
-                        $posX + $this->_width, $posY,
-                        $posX + $this->_width, $posY + $this->_height
+                        $posX + $this->width, $posY,
+                        $posX + $this->width, $posY + $this->_height
                     );
                     break;
                 case Table::LEFT:
@@ -642,7 +643,7 @@ class Cell extends AbstractElement
         $page->setFillColor($this->_bgColor);
         $this->drawRectangle($page, $posX,
             $posY,
-            $posX + $this->_width,
+            $posX + $this->width,
             $posY + $this->_height,
             Zend_Pdf_Page::SHAPE_DRAW_FILL);
         //reset style
@@ -682,10 +683,10 @@ class Cell extends AbstractElement
     {
         switch ($this->_hAlign) {
             case Table::RIGHT:
-                $x = $posX + $this->_width - $this->_text['width'] - $this->paddings[Table::RIGHT] - $this->_getBorderLineWidth(Table::RIGHT) / 2;
+                $x = $posX + $this->width - $this->_text['width'] - $this->paddings[Table::RIGHT] - $this->_getBorderLineWidth(Table::RIGHT) / 2;
                 break;
             case Table::CENTER:
-                $x = $posX + $this->_width / 2 - $this->_text['width'] / 2;
+                $x = $posX + $this->width / 2 - $this->_text['width'] / 2;
                 break;
             default: //LEFT
                 $x = $posX + $this->paddings[Table::LEFT] + $this->_getBorderLineWidth(Table::LEFT) / 2;
@@ -728,10 +729,10 @@ class Cell extends AbstractElement
     {
         switch ($this->_hAlign) {
             case Table::RIGHT:
-                $x = $posX + $this->_width - $this->_image['width'] - $this->paddings[Table::RIGHT];
+                $x = $posX + $this->width - $this->_image['width'] - $this->paddings[Table::RIGHT];
                 break;
             case Table::CENTER:
-                $x = $posX + $this->_width / 2 - $this->_image['width'] / 2;
+                $x = $posX + $this->width / 2 - $this->_image['width'] / 2;
                 break;
             default: //LEFT
                 $x = $posX + $this->paddings[Table::LEFT];
@@ -794,5 +795,15 @@ class Cell extends AbstractElement
         return $style;
     }
 
+    /**
+     * @param array $options
+     */
+    public function setStyles(array $options)
+    {
+        parent::setStyles($options);
+        if (isset($options['width'])) {
+            $this->setWidth($options['width']);
+        }
+    }
 }
 

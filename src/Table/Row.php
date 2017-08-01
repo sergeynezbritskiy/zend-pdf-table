@@ -44,7 +44,7 @@ class Row extends AbstractElement
     /**
      * Get Row Columns
      *
-     * @return \sergeynezbritskiy\ZendPdfTable\Table\Column[]
+     * @return Column[]
      */
     public function getColumns()
     {
@@ -346,6 +346,17 @@ class Row extends AbstractElement
             $width = 0;
         }
         return $width;
+    }
+
+    /**
+     * @return Column
+     */
+    public function createColumn()
+    {
+        $column = new Column();
+        //inherit styles from row
+        $column->setStyles($this->getStyles());
+        return $column;
     }
 
 }
