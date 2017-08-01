@@ -304,8 +304,8 @@ abstract class AbstractElement
             if (isset($style['line_color'])) {
                 $result->setLineColor($this->rgbArrayToColor($style['line_color']));
             }
-            if (isset($style['width'])) {
-                $result->setLineWidth($style['width']);
+            if (isset($style['line_width'])) {
+                $result->setLineWidth($style['line_width']);
             }
             return $result;
         }
