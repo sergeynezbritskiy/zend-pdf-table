@@ -24,6 +24,39 @@ class Table extends AbstractElement
     private $_pages;        //spanning pages or this table
     private $_repeatHeader = true;
 
+    private $_margin = [0, 0, 0, 0];
+
+    /**
+     * Set page margins
+     *
+     * @param array (TOP,RIGHT,BOTTOM,LEFT)
+     */
+    public function setMargins($margin = array())
+    {
+        $this->_margin = $margin;
+    }
+
+    /**
+     * Get Page Margins
+     *
+     * @return array(TOP,RIGHT,BOTTOM,LEFT)
+     */
+    public function getMargins()
+    {
+        return $this->_margin;
+    }
+
+    /**
+     * Get a Page margin
+     *
+     * @param My_Pdf ::Position $position
+     * @return int margin
+     */
+    public function getMargin($position)
+    {
+        return $this->_margin[$position];
+    }
+
     /**
      * Set Table Width
      *
@@ -66,12 +99,12 @@ class Table extends AbstractElement
         }
 
         if ($inContentArea) {
-            $start_y = $posY + $page->getMargin(self::TOP);
-            $max_y = $page->getHeight() - $page->getMargin(self::BOTTOM) - $page->getMargin(self::TOP);
+            $start_y = $posY + $this->getMargin(self::TOP);
+            $max_y = $page->getHeight() - $this->getMargin(self::BOTTOM) - $this->getMargin(self::TOP);
         } else {
             $start_y = $posY;
             $max_y = $page->getHeight();
-            $posX -= $page->getMargin(self::LEFT);
+            $posX -= $this->getMargin(self::LEFT);
         }
 
 
@@ -88,11 +121,10 @@ class Table extends AbstractElement
 
                 //copy previous page-settings
                 $nPage->setFont($page->getFont(), $page->getFontSize());
-                $nPage->setMargins($page->getMargins());
 
                 $page = $nPage;
                 $this->_pages[] = $page;
-                $y = $page->getMargin(self::TOP);
+                $y = $this->getMargin(self::TOP);
 
                 if ($this->_headerRow && $this->_repeatHeader) {
                     $header = $this->_rows[0];//pre-rendered header row (is first row)
