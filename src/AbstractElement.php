@@ -53,6 +53,11 @@ abstract class AbstractElement
     protected $paddings = [0, 0, 0, 0];
 
     /**
+     * @var int
+     */
+    protected $textAlign;
+
+    /**
      * Options array example
      * ```php
      * [
@@ -130,6 +135,9 @@ abstract class AbstractElement
         if (isset($options['padding_left'])) {
             $this->setPadding(self::LEFT, $options['padding_left']);
         }
+        if (isset($options['text_align'])) {
+            $this->setTextAlign($options['text_align']);
+        }
     }
 
     /**
@@ -149,6 +157,9 @@ abstract class AbstractElement
         }
         if ($this->getFontSize() !== null) {
             $result['font_size'] = $this->getFontSize();
+        }
+        if ($this->getTextAlign() !== null) {
+            $result['text_align'] = $this->getTextAlign();
         }
         $result['borders'] = $this->getBorderStyles();
         $result['paddings'] = $this->getPaddings();
@@ -255,6 +266,26 @@ abstract class AbstractElement
     public function setBorderStyle($position, $style)
     {
         $this->borderStyles[$position] = $this->ensureLineStyle($style);
+    }
+
+    /**
+     * Set Horizontal Alignment
+     *
+     * @param int $align
+     */
+    public function setTextAlign($align)
+    {
+        $this->textAlign = $align;
+    }
+
+    /**
+     * Get Alignment
+     *
+     * @return int
+     */
+    public function getTextAlign()
+    {
+        return $this->textAlign;
     }
 
     /**

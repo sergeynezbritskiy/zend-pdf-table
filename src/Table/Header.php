@@ -87,8 +87,8 @@ class Header extends Row
                     $col->setBorderStyle($pos, $style);
             }
 
-            if (!$col->getAlignment())
-                $col->setAlignment($this->_hAlign);
+            if (!$col->getTextAlign())
+                $col->setTextAlign($this->_hAlign);
         }
 
         parent::preRender($page, $posX, $posY);

@@ -25,7 +25,6 @@ class Cell extends AbstractElement
     private $_recommendedHeight;
     private $_text;
 
-    private $_hAlign;
     private $_vAlign;
     private $_bgColor;
     private $_textLineSpacing = 0;
@@ -94,26 +93,6 @@ class Cell extends AbstractElement
     public function setBackgroundColor(Zend_Pdf_Color $color)
     {
         $this->_bgColor = $color;
-    }
-
-    /**
-     * Set Horizontal Alignment
-     *
-     * @param int $align
-     */
-    public function setAlignment($align)
-    {
-        $this->_hAlign = $align;
-    }
-
-    /**
-     * Get Alignment
-     *
-     * @return int
-     */
-    public function getAlignment()
-    {
-        return $this->_hAlign;
     }
 
     /**
@@ -189,14 +168,15 @@ class Cell extends AbstractElement
      * Add text to cell
      *
      * @param string $text
-     * @param int $hAlign Horizontal Alignment
+     * @param int $textAlign Horizontal Alignment
      * @param int $vAlign Vertical Alignment
      */
-    public function setText($text, $hAlign = null, $vAlign = null)
+    public function setText($text, $textAlign = null, $vAlign = null)
     {
         $this->_text['text'] = $text;
-        if ($hAlign)
-            $this->_hAlign = $hAlign;
+        if ($textAlign) {
+            $this->setTextAlign($textAlign);
+        }
         if ($vAlign)
             $this->_vAlign = $vAlign;
     }
@@ -230,12 +210,12 @@ class Cell extends AbstractElement
      * Add image to cell
      *
      * @param string $filename full path
-     * @param int $hAlign Horizontal Alignment
+     * @param int $textAlign Horizontal Alignment
      * @param int $vAlign Vertical Alignment
      * @param float $scale between (0,1]
      * @throws \Zend_Exception
      */
-    public function setImage($filename, $hAlign = null, $vAlign = null, $scale = 1.00)
+    public function setImage($filename, $textAlign = null, $vAlign = null, $scale = 1.00)
     {
         $this->_image['filename'] = $filename;
 
@@ -243,7 +223,7 @@ class Cell extends AbstractElement
             throw new Zend_Exception("Scale must be between (0,1]", 'sergeynezbritskiy\ZendPdfTable\Table\Cell::addImage()');
         $this->_image['scale'] = $scale;
 
-        $this->_hAlign = $hAlign;
+        $this->setTextAlign($textAlign);
         $this->_vAlign = $vAlign;
     }
 
@@ -681,11 +661,12 @@ class Cell extends AbstractElement
      */
     private function _getTextPosX($posX)
     {
-        switch ($this->_hAlign) {
+        switch ($this->getTextAlign()) {
             case Table::RIGHT:
                 $x = $posX + $this->width - $this->_text['width'] - $this->paddings[Table::RIGHT] - $this->_getBorderLineWidth(Table::RIGHT) / 2;
                 break;
             case Table::CENTER:
+                $text = $this->_text;
                 $x = $posX + $this->width / 2 - $this->_text['width'] / 2;
                 break;
             default: //LEFT
@@ -727,7 +708,7 @@ class Cell extends AbstractElement
      */
     private function _getImagePosX($posX)
     {
-        switch ($this->_hAlign) {
+        switch ($this->getTextAlign()) {
             case Table::RIGHT:
                 $x = $posX + $this->width - $this->_image['width'] - $this->paddings[Table::RIGHT];
                 break;
