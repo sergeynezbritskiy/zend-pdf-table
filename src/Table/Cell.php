@@ -5,7 +5,6 @@ namespace sergeynezbritskiy\ZendPdfTable\Table;
 use sergeynezbritskiy\ZendPdfTable\AbstractElement;
 use sergeynezbritskiy\ZendPdfTable\Table;
 use Zend_Exception;
-use Zend_Pdf_Color;
 use Zend_Pdf_Image;
 use Zend_Pdf_Page;
 use Zend_Pdf_Style;
@@ -26,7 +25,6 @@ class Cell extends AbstractElement
     private $_text;
 
     private $_vAlign;
-    private $_bgColor;
     private $_textLineSpacing = 0;
 
     private $_image;
@@ -83,16 +81,6 @@ class Cell extends AbstractElement
     public function getRecommendedHeight()
     {
         return $this->_recommendedHeight;
-    }
-
-    /**
-     * Set Cell Background Color
-     *
-     * @param Zend_Pdf_Color $color
-     */
-    public function setBackgroundColor(Zend_Pdf_Color $color)
-    {
-        $this->_bgColor = $color;
     }
 
     /**
@@ -619,15 +607,17 @@ class Cell extends AbstractElement
      */
     private function _renderBackground(\Zend_Pdf_Page $page, $posX, $posY)
     {
-        if (!$this->_bgColor) return;
-        $page->setFillColor($this->_bgColor);
-        $this->drawRectangle($page, $posX,
-            $posY,
-            $posX + $this->width,
-            $posY + $this->_height,
-            Zend_Pdf_Page::SHAPE_DRAW_FILL);
-        //reset style
-        $page->setStyle($this->getDefaultStyle());
+        if ($this->getBackgroundColor()) {
+            $page->setFillColor($this->getBackgroundColor());
+            $this->drawRectangle($page, $posX,
+                $posY,
+                $posX + $this->width,
+                $posY + $this->_height,
+                Zend_Pdf_Page::SHAPE_DRAW_FILL);
+            //reset style
+            $page->setStyle($this->getDefaultStyle());
+        }
+
     }
 
     /**

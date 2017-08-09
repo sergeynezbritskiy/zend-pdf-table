@@ -33,6 +33,11 @@ abstract class AbstractElement
     protected $lineColor;
 
     /**
+     * @var Zend_Pdf_Color_Rgb
+     */
+    protected $backgroundColor;
+
+    /**
      * @var Zend_Pdf_Resource_Font
      */
     protected $fontStyle;
@@ -109,6 +114,9 @@ abstract class AbstractElement
         }
         if (isset($options['font_size'])) {
             $this->setFontSize($options['font_size']);
+        }
+        if (isset($options['background_color'])) {
+            $this->setBackgroundColor($options['background_color']);
         }
         if (isset($options['borders'])) {
             $this->setBorderStyles($options['borders']);
@@ -201,6 +209,22 @@ abstract class AbstractElement
     public function setFillColor($fillColor)
     {
         $this->fillColor = $this->ensureColor($fillColor);
+    }
+
+    /**
+     * @return Zend_Pdf_Color_Rgb
+     */
+    public function getBackgroundColor()
+    {
+        return $this->backgroundColor;
+    }
+
+    /**
+     * @param array|Zend_Pdf_Color_Rgb $backgroundColor
+     */
+    public function setBackgroundColor($backgroundColor)
+    {
+        $this->backgroundColor = $this->ensureColor($backgroundColor);
     }
 
     /**
