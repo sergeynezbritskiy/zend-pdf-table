@@ -561,17 +561,15 @@ class Cell extends AbstractElement
                     );
                     break;
                 case Table::RIGHT:
-                    //@@TODO INCLUDE BORDER LINE WIDTH??
                     $this->drawLine($page,
-                        $posX + $this->width, $posY,
-                        $posX + $this->width, $posY + $this->_height
+                        $posX + $this->width - $this->_getBorderLineWidth(self::RIGHT) / 2, $posY,
+                        $posX + $this->width - $this->_getBorderLineWidth(self::RIGHT) / 2, $posY + $this->_height
                     );
                     break;
                 case Table::LEFT:
-                    //@@TODO INCLUDE BORDER LINE WIDTH??
                     $this->drawLine($page,
-                        $posX, $posY,
-                        $posX, $posY + $this->_height
+                        $posX + $this->_getBorderLineWidth(self::LEFT) / 2, $posY,
+                        $posX + $this->_getBorderLineWidth(self::LEFT) / 2, $posY + $this->_height
                     );
                     break;
             }
