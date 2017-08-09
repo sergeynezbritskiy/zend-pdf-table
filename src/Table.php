@@ -24,39 +24,6 @@ class Table extends AbstractElement
     private $_pages;        //spanning pages or this table
     private $_repeatHeader = true;
 
-    private $_margin = [0, 0, 0, 0];
-
-    /**
-     * Set page margins
-     *
-     * @param array (TOP,RIGHT,BOTTOM,LEFT)
-     */
-    public function setMargins($margin = array())
-    {
-        $this->_margin = $margin;
-    }
-
-    /**
-     * Get Page Margins
-     *
-     * @return array(TOP,RIGHT,BOTTOM,LEFT)
-     */
-    public function getMargins()
-    {
-        return $this->_margin;
-    }
-
-    /**
-     * Get a Page margin
-     *
-     * @param My_Pdf ::Position $position
-     * @return int margin
-     */
-    public function getMargin($position)
-    {
-        return $this->_margin[$position];
-    }
-
     /**
      * Set Table Width
      *

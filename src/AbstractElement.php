@@ -53,6 +53,11 @@ abstract class AbstractElement
     protected $paddings = [0, 0, 0, 0];
 
     /**
+     * @var int[]
+     */
+    protected $margins = [0, 0, 0, 0];
+
+    /**
      * @var int
      */
     protected $textAlign;
@@ -135,6 +140,21 @@ abstract class AbstractElement
         if (isset($options['padding_left'])) {
             $this->setPadding(self::LEFT, $options['padding_left']);
         }
+        if (isset($options['margins'])) {
+            $this->setMargins($options['margins']);
+        }
+        if (isset($options['margin_top'])) {
+            $this->setMargin(self::TOP, $options['margin_top']);
+        }
+        if (isset($options['margin_right'])) {
+            $this->setMargin(self::RIGHT, $options['margin_right']);
+        }
+        if (isset($options['margin_bottom'])) {
+            $this->setMargin(self::BOTTOM, $options['margin_bottom']);
+        }
+        if (isset($options['margin_left'])) {
+            $this->setMargin(self::LEFT, $options['margin_left']);
+        }
         if (isset($options['text_align'])) {
             $this->setTextAlign($options['text_align']);
         }
@@ -163,6 +183,7 @@ abstract class AbstractElement
         }
         $result['borders'] = $this->getBorderStyles();
         $result['paddings'] = $this->getPaddings();
+        $result['margins'] = $this->getMargins();
         return $result;
     }
 
@@ -320,6 +341,40 @@ abstract class AbstractElement
     public function setPadding($position, $cellPadding)
     {
         $this->paddings[$position] = $cellPadding;
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getMargins()
+    {
+        return $this->margins;
+    }
+
+    /**
+     * @param int[] $margins
+     */
+    public function setMargins($margins)
+    {
+        $this->margins = $margins;
+    }
+
+    /**
+     * @param int $position
+     * @return int
+     */
+    public function getMargin($position)
+    {
+        return isset($this->margins[$position]) ? $this->margins[$position] : 0;
+    }
+
+    /**
+     * @param int $position
+     * @param int $margin
+     */
+    public function setMargin($position, $margin)
+    {
+        $this->margins[$position] = $margin;
     }
 
     /**
