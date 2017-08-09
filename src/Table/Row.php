@@ -192,7 +192,7 @@ class Row extends AbstractElement
         } else {
             //no width given, use available page width
             if ($inContentArea) {
-                $max_row_width = $page->getWidth() - $page->getMargin(Table::LEFT) - $page->getMargin(Table::RIGHT);
+                $max_row_width = $page->getWidth();//TODO add margin support - $page->getMargin(Table::LEFT) - $page->getMargin(Table::RIGHT);
             } else {
                 $max_row_width = $page->getWidth();
             }

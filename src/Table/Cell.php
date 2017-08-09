@@ -263,7 +263,7 @@ class Cell extends AbstractElement
         if (!$this->width) {
             //no width given, get max width of page
             if ($inContentArea) {
-                $width = $page->getWidth() - $posX - ($page->getMargin(Table::LEFT) + $page->getMargin(Table::RIGHT));
+                $width = $page->getWidth() - $posX;//TODO add margin support - ($page->getMargin(Table::LEFT) + $page->getMargin(Table::RIGHT));
             } else {
                 $width = $page->getWidth() - $posX;
             }
@@ -551,8 +551,8 @@ class Cell extends AbstractElement
     public function drawText(\Zend_Pdf_Page $page, $text, $x1, $y1, $charEncoding = "")
     {
         //move origin
-        $y1 = $page->getHeight() - $y1 - $page->getMargin(Table::TOP);
-        $x1 = $x1 + $page->getMargin(Table::LEFT);
+        $y1 = $page->getHeight() - $y1;//TODO add margin support - $page->getMargin(Table::TOP);
+        //TODO add margin support $x1 = $x1 + $page->getMargin(Table::LEFT);
         return $page->drawText($text, $x1, $y1, $charEncoding);
     }
 
@@ -565,8 +565,8 @@ class Cell extends AbstractElement
 
     public function drawImage(\Zend_Pdf_Page $page, \Zend_Pdf_Resource_Image $image, $x1, $y1, $width, $height)
     {
-        $y1 = $page->getHeight() - $y1 - $page->getMargin(Table::TOP) - $height;
-        $x1 = $x1 + $page->getMargin(Table::LEFT);
+        $y1 = $page->getHeight() - $y1 - $height;//TODO add margin support - $page->getMargin(Table::TOP);
+        //TODO add margin support $x1 = $x1 + $page->getMargin(Table::LEFT);
 
         $y2 = $y1 + $height;
         $x2 = $x1 + $width;
@@ -624,10 +624,10 @@ class Cell extends AbstractElement
      */
     public function drawLine(\Zend_Pdf_Page $page, $x1, $y1, $x2, $y2)
     {
-        $y1 = $page->getHeight() - $y1 - $page->getMargin(Table::TOP);
-        $y2 = $page->getHeight() - $y2 - $page->getMargin(Table::TOP);
-        $x1 = $x1 + $page->getMargin(Table::LEFT);
-        $x2 = $x2 + $page->getMargin(Table::LEFT);
+        $y1 = $page->getHeight() - $y1;//TODO add margin support - $page->getMargin(Table::TOP);
+        $y2 = $page->getHeight() - $y2;//TODO add margin support - $page->getMargin(Table::TOP);
+        //TODO add margin support $x1 = $x1 + $page->getMargin(Table::LEFT);
+        //TODO add margin support$x2 = $x2 + $page->getMargin(Table::LEFT);
 
         return $page->drawLine($x1, $y1, $x2, $y2);
     }
@@ -664,10 +664,10 @@ class Cell extends AbstractElement
     public function drawRectangle(\Zend_Pdf_Page $page, $x1, $y1, $x2, $y2, $fillType = null)
     {
         //move origin
-        $y1 = $page->getHeight() - $y1 - $page->getMargin(Table::TOP);
-        $y2 = $page->getHeight() - $y2 - $page->getMargin(Table::TOP);
-        $x1 = $x1 + $page->getMargin(Table::LEFT);
-        $x2 = $x2 + $page->getMargin(Table::LEFT);
+        $y1 = $page->getHeight() - $y1;//TODO add margin support - $page->getMargin(Table::TOP);
+        $y2 = $page->getHeight() - $y2;//TODO add margin support - $page->getMargin(Table::TOP);
+        //TODO add margin support $x1 = $x1 + $page->getMargin(Table::LEFT);
+        //TODO add margin support $x2 = $x2 + $page->getMargin(Table::LEFT);
 
         return $page->drawRectangle($x1, $y1, $x2, $y2, $fillType);
     }
