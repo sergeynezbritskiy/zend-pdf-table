@@ -651,11 +651,10 @@ class Cell extends AbstractElement
     {
         switch ($this->getTextAlign()) {
             case Table::RIGHT:
-                $x = $posX + $this->width - $this->_text['width'] - $this->paddings[Table::RIGHT] - $this->_getBorderLineWidth(Table::RIGHT) / 2;
+                $x = $posX + $this->getWidth() + $this->getMargin(self::LEFT)  - $this->_text['width'] - $this->paddings[Table::RIGHT] - $this->_getBorderLineWidth(Table::RIGHT);
                 break;
             case Table::CENTER:
-                $text = $this->_text;
-                $x = $posX + $this->width / 2 - $this->_text['width'] / 2;
+                $x = $posX + $this->getWidth() / 2 - $this->_text['width'] / 2;
                 break;
             default: //LEFT
                 $x = $posX + $this->paddings[Table::LEFT] + $this->_getBorderLineWidth(Table::LEFT) / 2;
