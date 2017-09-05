@@ -200,17 +200,11 @@ class Cell extends AbstractElement
      * @param string $filename full path
      * @param int $textAlign Horizontal Alignment
      * @param int $vAlign Vertical Alignment
-     * @param float $scale between (0,1]
      * @throws \Zend_Exception
      */
-    public function setImage($filename, $textAlign = null, $vAlign = null, $scale = 1.00)
+    public function setImage($filename, $textAlign = null, $vAlign = null)
     {
         $this->_image['filename'] = $filename;
-
-        if ($scale > 1)
-            throw new Zend_Exception("Scale must be between (0,1]", 'sergeynezbritskiy\ZendPdfTable\Table\Cell::addImage()');
-        $this->_image['scale'] = $scale;
-
         $this->setTextAlign($textAlign);
         $this->_vAlign = $vAlign;
     }
@@ -279,15 +273,34 @@ class Cell extends AbstractElement
         } elseif ($this->_image) {
 
             $image = Zend_Pdf_Image::imageWithPath($this->_image['filename']);
+            //assuming the image is not a "skyscraper"
+            $width = $image->getPixelWidth();
+            $height = $image->getPixelHeight();
+
+            $widthLimit = $this->getContentWidth() ?: $width;
+            $heightLimit = $this->getContentHeight() ?: $height;
+
+            //preserving aspect ratio (proportions)
+            $ratio = $width / $height;
+            if ($ratio > 1 && $width > $widthLimit) {
+                $width = $widthLimit;
+                $height = $width / $ratio;
+            } elseif ($ratio < 1 && $height > $heightLimit) {
+                $height = $heightLimit;
+                $width = $height * $ratio;
+            } elseif ($ratio == 1 && $height > $heightLimit) {
+                $height = $heightLimit;
+                $width = $widthLimit;
+            }
 
             if (!$this->width)
-                $this->_recommendedWidth = $this->_image['scale'] * $image->getPixelWidth() + ($this->paddings[Table::LEFT] + $this->paddings[Table::RIGHT]) + $this->_getBorderLineWidth(Table::LEFT) + $this->_getBorderLineWidth(Table::RIGHT);
+                $this->_recommendedWidth = $width + ($this->paddings[Table::LEFT] + $this->paddings[Table::RIGHT]) + $this->_getBorderLineWidth(Table::LEFT) + $this->_getBorderLineWidth(Table::RIGHT);
             if (!$this->_height)
-                $this->_recommendedHeight = $this->_image['scale'] * $image->getPixelHeight() + ($this->paddings[Table::TOP] + $this->paddings[Table::BOTTOM]);
+                $this->_recommendedHeight = $height + ($this->paddings[Table::TOP] + $this->paddings[Table::BOTTOM]);
 
             $this->_image['image'] = $image;
-            $this->_image['width'] = $this->_image['scale'] * $image->getPixelWidth();
-            $this->_image['height'] = $this->_image['scale'] * $image->getPixelHeight();
+            $this->_image['width'] = $width;
+            $this->_image['height'] = $height;
         } else {
             throw new Zend_Exception("not defined", "preRender()");
         }
@@ -651,7 +664,7 @@ class Cell extends AbstractElement
     {
         switch ($this->getTextAlign()) {
             case Table::RIGHT:
-                $x = $posX + $this->getWidth() + $this->getMargin(self::LEFT)  - $this->_text['width'] - $this->paddings[Table::RIGHT] - $this->_getBorderLineWidth(Table::RIGHT);
+                $x = $posX + $this->getWidth() + $this->getMargin(self::LEFT) - $this->_text['width'] - $this->paddings[Table::RIGHT] - $this->_getBorderLineWidth(Table::RIGHT);
                 break;
             case Table::CENTER:
                 $x = $posX + $this->getWidth() / 2 - $this->_text['width'] / 2;
