@@ -22,6 +22,9 @@ abstract class AbstractElement
     const CENTER = 4;
     const MIDDLE = 5;
 
+    const CONTENT_TYPE_TEXT = 'text';
+    const CONTENT_TYPE_IMAGE = 'image';
+
     /**
      * @var Zend_Pdf_Color_Rgb
      */
@@ -66,6 +69,21 @@ abstract class AbstractElement
      * @var int
      */
     protected $textAlign;
+
+    /**
+     * @var string
+     */
+    protected $contentType;
+
+    /**
+     * @var int
+     */
+    protected $contentWidth;
+
+    /**
+     * @var int
+     */
+    protected $contentHeight;
 
     /**
      * Options array example
@@ -166,6 +184,15 @@ abstract class AbstractElement
         if (isset($options['text_align'])) {
             $this->setTextAlign($options['text_align']);
         }
+        if (isset($options['content_type'])) {
+            $this->setContentType($options['content_type']);
+        }
+        if (isset($options['content_width'])) {
+            $this->setContentWidth($options['content_width']);
+        }
+        if (isset($options['content_height'])) {
+            $this->setContentHeight($options['content_height']);
+        }
     }
 
     /**
@@ -188,6 +215,15 @@ abstract class AbstractElement
         }
         if ($this->getTextAlign() !== null) {
             $result['text_align'] = $this->getTextAlign();
+        }
+        if ($this->getContentType() !== null) {
+            $result['content_type'] = $this->getContentType();
+        }
+        if ($this->getContentWidth() !== null) {
+            $result['content_width'] = $this->getContentWidth();
+        }
+        if ($this->getContentHeight() !== null) {
+            $result['content_height'] = $this->getContentHeight();
         }
         $result['borders'] = $this->getBorderStyles();
         $result['paddings'] = $this->getPaddings();
@@ -402,23 +438,51 @@ abstract class AbstractElement
     }
 
     /**
-     * @param $style
-     * @return \Zend_Pdf_Style
+     * @return string
      */
-    private function ensureLineStyle($style)
+    public function getContentType()
     {
-        if ($style instanceof Zend_Pdf_Style) {
-            return $style;
-        } else {
-            $result = new \Zend_Pdf_Style();
-            if (isset($style['line_color'])) {
-                $result->setLineColor($this->rgbArrayToColor($style['line_color']));
-            }
-            if (isset($style['line_width'])) {
-                $result->setLineWidth($style['line_width']);
-            }
-            return $result;
-        }
+        return $this->contentType;
+    }
+
+    /**
+     * @param string $contentType
+     */
+    public function setContentType($contentType)
+    {
+        $this->contentType = $contentType;
+    }
+
+    /**
+     * @return int
+     */
+    public function getContentWidth()
+    {
+        return $this->contentWidth;
+    }
+
+    /**
+     * @param int $contentWidth
+     */
+    public function setContentWidth($contentWidth)
+    {
+        $this->contentWidth = $contentWidth;
+    }
+
+    /**
+     * @return int
+     */
+    public function getContentHeight()
+    {
+        return $this->contentHeight;
+    }
+
+    /**
+     * @param int $contentHeight
+     */
+    public function setContentHeight($contentHeight)
+    {
+        $this->contentHeight = $contentHeight;
     }
 
     /**
@@ -450,6 +514,26 @@ abstract class AbstractElement
             $color[1] / 255,
             $color[2] / 255
         );
+    }
+
+    /**
+     * @param $style
+     * @return \Zend_Pdf_Style
+     */
+    private function ensureLineStyle($style)
+    {
+        if ($style instanceof Zend_Pdf_Style) {
+            return $style;
+        } else {
+            $result = new \Zend_Pdf_Style();
+            if (isset($style['line_color'])) {
+                $result->setLineColor($this->rgbArrayToColor($style['line_color']));
+            }
+            if (isset($style['line_width'])) {
+                $result->setLineWidth($style['line_width']);
+            }
+            return $result;
+        }
     }
 
 }
